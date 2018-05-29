@@ -1,0 +1,28 @@
+<!doctype html>
+
+{% extends 'layout.html' %}
+
+{% block body %}
+ <div class="jumbotron text-center">
+        <div class="container">
+          <h1 class="display-3">Gunakan Ceph</h1>
+          <p>Untuk menambah OSD.</p>
+        </div>
+      </div>
+
+      <form action = "http://10.10.6.1:8000/Konfigurasi/TambahOSD" method = post>
+
+         <fieldset>
+            {{ form.hidden_tag() }}
+
+            <div style = font-size:20px>
+               	 {{ form.ip_addr.label }} : {{ form.ip_addr }} <br>
+		 {{ form.device.label }} : {{ form.device }} <br>
+		 {{ form.isjournal.label }}? {{ form.isjournal }} <br>
+ 		 {{ form.journal.label }} : {{ form.journal }} <br>
+	   	 {{form.submit}}
+            </div>
+         </fieldset>
+      </form>
+
+{% endblock %}

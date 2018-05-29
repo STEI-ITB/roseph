@@ -208,12 +208,6 @@ osd_scenario: lvm
 lvm_volumes:
    - data: /dev/sdb
      journal: /dev/sda6
-   - data: /dev/sdc
-     journal: /dev/sda7
-   - data: /dev/sdd
-     journal: /dev/sda8
-#   - data: /dev/sdd
-#     journal: /dev/sda8
 #
 # Bluestore: Each dictionary must contain at least data. When defining wal or
 # db, it must have both the lv name and vg group (db and wal are not required).

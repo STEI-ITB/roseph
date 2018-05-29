@@ -49,11 +49,12 @@ class BuatImage(Form):
     kapasitas = IntegerField('Kapasitas dalam GB')
     submit = SubmitField()
 
-class TambahOSD(From)
+class TambahOSD(Form):
     ip_addr = StringField('Alamat IP')
     device  = StringField('Device untuk OSD Baru')
     isjournal = BooleanField('Menggunakan Journal')
     journal = StringField('Device untuk Journal - Opsional')
+    submit = SubmitField()
 
 @app.route('/')
 def index():
@@ -216,40 +217,42 @@ def konfig():
     r3=requests.get('http://10.10.6.1:5000/api/v0.1/osd/crush/dump.json', headers=headers)
     return render_template('konfig.html',data =json.loads(r1.text),datamds=json.loads(r2.text), dataosd=json.loads(r3.text))
 
-@app.route('/Konfigurasi/DeleteOSD/<string:namaosd>')
-def delOSD(namaosd):
+#@app.route('/Konfigurasi/DeleteOSD/<string:namaosd>')
+#def delOSD(namaosd):
 	
 @app.route('/Konfigurasi/TambahOSD', methods = ['GET','POST'])
 def addOSD():
     form = TambahOSD(request.form)
     if request.method == 'POST':
         if form.validate() == False:
-            return render_template('editpool.html',form=form, poolname=poolname)
+            return render_template('addosd.html',form=form)
         else:
             #daftarkan IP node baru di /etc/ansible/hosts
-	    file = open('/etc/ansible/hosts','r')
+	    file = open('/home/tasds/roseph/ceph-ansible/hosts2','r')
 	    lines = file.readlines()
 	    file.close()
-	    file = open('/etc/ansible/hosts','w')
-	    while (line != "[osds]"+"\n"):
-		file.write(line)
+	    file = open('/home/tasds/roseph/ceph-ansible/hosts2','w')
+	    count = 0
+	    while (lines[count] != "[osds]\n"):
+		file.write(lines[count])
+		count = count +1
 	    file.write("[osds]\n")
 	    file.write(form.ip_addr.data)
 	    file.close()
-	    #buka osd.yml pakai pyyaml
-	    
-            return redirect('/VolumeList')
+	    #buka osds.yml pakai pyyaml
+	    stream = open('/home/tasds/roseph/ceph-ansible/group_vars/osds.yml','r')
+	    osds   = yaml.load(stream)
+	    osds["lvm_volumes"][0]["data"] = form.device.data
+	    if form.isjournal.data == False:
+		osds["lvm_volumes"][0]["journal"] = form.device.data
+	    else:
+		osds["lvm_volumes"][0]["journal"] = form.journal.data
+            #jalankan bash shellnya
+	    bashCommand = "ansible-playbook /home/tasds/roseph/ceph-ansible/osd-configure.yml"
+	    output = subprocess.check_output(['bash','-c', bashCommand])
+            return redirect('/Konfigurasi')
     elif request.method == 'GET':
-        return render_template('editpool.html', form=form, poolname=poolname)
-
-
-
-
-
-
-
-
-
+        return render_template('addosd.html', form=form)
 
 
 @app.route('/Kirim', methods = ['GET','POST'])
