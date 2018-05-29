@@ -2,6 +2,7 @@
 ---
 
 - hosts: localhost
+  become: yes
   environment:
      http_proxy: http://xxx:xxx@cache.itb.ac.id:8080
 
@@ -49,7 +50,7 @@
      # Configure MySQL, if required
      #######################################################
 
-      - name: Set the MySQL root password
+     - name: Set the MySQL root password
        mysql_user:
           user: root
           password: '{{ mysql_root_password }}'
