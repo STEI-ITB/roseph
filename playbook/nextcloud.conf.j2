@@ -1,0 +1,22 @@
+<VirtualHost *:80>
+ServerAdmin admin@yourdomain.com
+DocumentRoot /var/www/nextcloud
+ServerName {{ ansible_default_ipv4.address }}
+ServerAlias {{ ansible_default_ipv4.address }}
+
+Alias /nextcloud "/var/www/html/nextcloud/"
+<Directory /var/www/html/nextcloud/>
+ Options +FollowSymlinks
+ AllowOverride All
+
+<IfModule mod_dav.c>
+ Dav off
+ </IfModule>
+
+SetEnv HOME /var/www/html/nextcloud
+ SetEnv HTTP_HOME /var/www/html/nextcloud
+</Directory>
+
+ErrorLog /var/log/apache2/nextcloud-error_log
+CustomLog /var/log/apache2/nextcloud-access_log common
+</VirtualHost>
