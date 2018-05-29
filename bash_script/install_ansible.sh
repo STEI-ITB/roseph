@@ -1,11 +1,14 @@
+#!/bin/bash
+#
+# Prepare system for Ansible deployment
+#
 prepare_ubuntu() {
         sudo apt install software-properties-common -y
         sudo -E apt-add-repository ppa:ansible/ansible -y
         sudo apt update -y
         sudo apt install ansible python-mysqldb mc vim git -y
-        sudo apt install python-minimal -y
         echo
-        echo "Ubuntu Sytem ready"
+        echo "Ubuntu Sytem ready."
         echo
 }
 
@@ -17,7 +20,7 @@ prepare_debian() {
         sudo pip install setuptools -U
         sudo pip install ansible -U
         echo
-        echo "Debian Sytem ready"
+        echo "Debian Sytem ready."
         echo
 }
 
@@ -26,10 +29,9 @@ prepare_centos() {
         sudo yum install ansible git vim mc python-mysqldb -y
         sudo yum update -y
         echo
-        echo "CentOS Sytem"
+        echo "CentOS Sytem ready."
         echo
 }
-
 
 usage() {
         echo
@@ -55,7 +57,6 @@ case $ID in
         'centos')
                 prepare_centos
         ;;
-
         *)
                 usage
         ;;
