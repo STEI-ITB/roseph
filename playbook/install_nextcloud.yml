@@ -133,7 +133,7 @@
      - name: bring /etc/nginx/nginx.conf in place
        template:
          src: nextcloud.conf.j2
-         dest: /etc/apache2/nextcloud.conf
+         dest: /etc/apache2/sites-available/nextcloud.conf
          owner: root
          group: root
          mode: 0644
