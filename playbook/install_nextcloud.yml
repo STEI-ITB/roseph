@@ -1,0 +1,147 @@
+
+---
+
+- hosts: localhost
+  environment:
+     http_proxy: http://xxx:xxx@cache.itb.ac.id:8080
+
+     # You can also set it over https.
+     https_proxy: http://xxx:xxx@cache.itb.ac.id:8080
+
+  vars:
+     nextcloud_dir:       /var/www/html/nextcloud
+     data_dir:            /var/www/html/nextcloud/data
+     database:            mysql
+
+  vars_prompt:
+     - name: "mysql_root_password"
+       prompt: "Enter MySQL Root Password: "
+       private: yes
+
+     - name: "ncuser_password"
+       prompt: "Enter Nextcloud User Database Password: "
+       private: yes
+
+  tasks:
+
+     - name: Install Apache
+       apt:
+          name: apache2
+          state: present
+          update_cache: yes
+
+
+     #######################################################
+     # Install MySQL and associated packages, if required
+     #######################################################
+
+     - name: Install MySQL and associated packages for Raspbian Stretch
+       apt:
+          name: '{{item}}'
+          state: present
+       with_items:
+          - mysql-server
+          - python-mysqldb
+          - php7.0-mysql
+       when: database == 'mysql'
+
+     #######################################################
+     # Configure MySQL, if required
+     #######################################################
+
+      - name: Set the MySQL root password
+       mysql_user:
+          user: root
+          password: '{{ mysql_root_password }}'
+          host: localhost
+       when: database == 'mysql'
+
+     - name: Create MySQL database
+       mysql_db:
+          login_user: root
+          login_password: '{{ mysql_root_password }}'
+          name: nextcloud
+          state: present
+       when: database == 'mysql'
+
+     - name: Create MySQL admin user
+       mysql_user:
+          login_user: root
+          login_password: '{{ mysql_root_password }}'
+          name: ncuser
+          password: '{{ ncuser_password }}'
+          priv: '*.*:ALL,GRANT'
+          state: present
+       when: database == 'mysql'
+
+     ###################################################
+     # Install php packages required by Nextcloud
+     ###################################################
+
+     - name: Install php 7 package
+       apt:  name='{{item}}' state=present
+       with_items:
+          - php7.0
+          - php7.0-json
+          - php7.0-intl
+          - php7.0-mcrypt
+          - php-imagick
+          - php7.0-gd
+          - php7.0-sqlite3
+          - php7.0-curl
+          - php7.0-zip
+          - php7.0-xml
+          - php7.0-mbstring
+          - libapache2-mod-php7.0
+
+     ###################################################
+     # Install and configure Nextcloud
+     ###################################################
+
+
+     - name: Download the latest version of Nextcloud
+       get_url:
+          url: https://download.nextcloud.com/server/releases/latest.zip
+          dest: /tmp/nextcloud.zip
+          use_proxy: yes
+
+     - name: Unzip Nextcloud
+       unarchive:
+          src: /tmp/nextcloud.zip
+          dest: '{{nextcloud_dir | dirname}}'
+          remote_src: yes
+
+     - name: Create data directory '{{data_dir}}'
+       file:
+          path: '{{data_dir}}'
+          state: directory
+          owner: www-data
+          group: www-data
+          mode: 0750
+          recurse: yes
+
+     - name: Set Nextcloud directory ownerships
+       file:
+          path: '{{nextcloud_dir}}/{{item}}'
+          owner: www-data
+          group: www-data
+       with_items:
+          - config
+          - apps
+
+     - name: bring /etc/nginx/nginx.conf in place
+       template:
+         src: nextcloud.conf.j2
+         dest: /etc/apache/nextcloud.conf
+         owner: root
+         group: root
+         mode: 0644
+       force: true
+       notify: restart apache
+
+  handlers:  
+     - name: restart apache
+       service:
+          name: apache2
+          state: restarted
+          enabled: yes
