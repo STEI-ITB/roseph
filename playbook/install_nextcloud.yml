@@ -36,7 +36,7 @@
      # Install MySQL and associated packages, if required
      #######################################################
 
-     - name: Install MySQL and associated packages for Raspbian Stretch
+     - name: Install MySQL and associated packages for Ubuntu
        apt:
           name: '{{item}}'
           state: present
