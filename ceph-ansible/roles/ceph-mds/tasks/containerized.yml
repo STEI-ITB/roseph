@@ -1,0 +1,70 @@
+---
+- name: set_fact docker_exec_cmd mds
+  set_fact:
+    docker_exec_cmd: "docker exec ceph-mds-{{ ansible_hostname }}"
+
+- name: set_fact ceph_config_keys
+  set_fact:
+    ceph_config_keys:
+      - /var/lib/ceph/bootstrap-mds/{{ cluster }}.keyring
+
+- name: stat for ceph config and keys
+  local_action:
+    module: stat
+    path: "{{ fetch_directory }}/{{ fsid }}/{{ item }}"
+  with_items: "{{ ceph_config_keys }}"
+  changed_when: false
+  become: false
+  failed_when: false
+  check_mode: no
+  register: statconfig
+
+- name: try to fetch ceph config and keys
+  copy:
+    src: "{{ fetch_directory }}/{{ fsid }}/{{ item.0 }}"
+    dest: "{{ item.0 }}"
+    owner: root
+    group: root
+    mode: 0644
+  changed_when: false
+  with_together:
+    - "{{ ceph_config_keys }}"
+    - "{{ statconfig.results }}"
+  when: item.1.stat.exists == true
+
+- name: set selinux permissions
+  shell: |
+    chcon -Rt svirt_sandbox_file_t {{ item }}
+  with_items:
+    - "{{ ceph_conf_key_directory }}"
+    - /var/lib/ceph
+  changed_when: false
+  when:
+    - ansible_os_family == 'RedHat'
+    - sestatus.stdout != 'Disabled'
+
+- name: generate systemd unit file
+  become: true
+  template:
+    src: "{{ role_path }}/templates/ceph-mds.service.j2"
+    dest: /etc/systemd/system/ceph-mds@.service
+    owner: "root"
+    group: "root"
+    mode: "0644"
+  notify:
+    - restart ceph mdss
+
+- name: systemd start mds container
+  systemd:
+    name: ceph-mds@{{ ansible_hostname }}
+    state: started
+    enabled: yes
+    daemon_reload: yes
+  changed_when: false
+
+- name: wait for mds socket to exist
+  command: "{{ docker_exec_cmd }} sh -c 'stat /var/run/ceph/{{ cluster }}-mds.{{ ansible_hostname }}.asok || stat /var/run/ceph/{{ cluster }}-mds.{{ ansible_fqdn }}.asok'"
+  register: multi_mds_socket
+  retries: 5
+  delay: 15
+  until: multi_mds_socket.rc == 0

@@ -1,0 +1,14 @@
+---
+- name: set_fact docker_exec_cmd
+  set_fact:
+    docker_exec_cmd: "docker exec ceph-mds-{{ ansible_hostname }}"
+  when:
+    - containerized_deployment
+
+- name: non_containerized.yml
+  include: non_containerized.yml
+  when: not containerized_deployment
+
+- name: containerized.yml
+  include: containerized.yml
+  when: containerized_deployment

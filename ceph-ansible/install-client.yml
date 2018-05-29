@@ -1,0 +1,35 @@
+---
+- hosts: clients
+  become: yes
+  tasks:
+    - name: add key latest ceph debian
+      raw: wget -q -O- 'https://download.ceph.com/keys/release.asc' | sudo apt-key add -
+
+    - name: add repository ceph
+      raw: echo deb https://download.ceph.com/debian-luminous/ $(lsb_release -sc) main | sudo tee /etc/apt/sources.list.d/ceph.list
+
+    - name: update apt cache
+      apt:
+        update_cache: yes
+
+    - name: install ceph-common
+      apt:
+         name: ceph-common
+         state: latest
+
+- hosts: 10.10.6.251
+  become: yes
+  tasks:
+    - name: copy client key
+      synchronize: 
+        src: /home/tasds/{{ client }}.keyring
+        dest: /home/tasds/ceph.client.{{ client }}.keyring
+      delegate_to: 10.10.1.50 
+      become: false
+
+    - name: copy configuration file
+      synchronize: 
+        src: /etc/ceph/ceph.conf
+        dest: /home/tasds/ceph.conf
+      delegate_to: 10.10.1.50 
+      become: false  

@@ -1,0 +1,4 @@
+osd_scenario: lvm
+lvm_volumes:
+   - data: /dev/sda3
+     journal: /dev/sda4
