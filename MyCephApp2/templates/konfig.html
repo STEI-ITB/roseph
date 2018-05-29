@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+{% extends 'layout.html' %}
+<head>
+    <meta charset="UTF-8">
+    <title>Judul</title>
+    <style>
+        .tombol {
+          padding: 15px 25px;
+          font-size: 32px;
+          text-align: center;
+          cursor: pointer;
+          outline: none;
+          color: #fff;
+          background-color: #4CAF50;
+          border: none;
+          border-radius: 15px;
+          box-shadow: 0 9px #999;
+        }
+        .tombol:hover {background-color: #3e8e41}
+        .tombol:active {
+          background-color: #3e8e41;
+          box-shadow: 0 5px #666;
+          transform: translateY(4px);
+        }
+        .danger {background-color: #f44336;} /* Red */
+        .danger:hover {background: #da190b;}
+    </style>
+<body>
+    {% block body %}
+        <div class="jumbotron text-center">
+                <div class="container">
+                  <h1 class="display-3">Gunakan aplikasi web</h1>
+                  <p>untuk mengatur konfigurasi cluster.</p>
+                </div>
+              </div>
+
+        <h1>
+            Daftar OSD
+        </h1><br>
+	<a href="/AddUser/form"> <button class="tombol"> + </button></a><br>
+	 <table class="table table-striped table-sm">
+        <thead>
+        <tr>
+                  <th>Name</th>
+                  <th>ID</th>
+                  <th>Class</th>
+		  <th>Delete</th>
+        </tr>
+        </thead>
+         {% for i in dataosd.output.devices %}
+        <tr>
+        <tbody>
+        <td> {{i.name}}</td>
+        <td> {{i.id}}</td>
+        <td> {{i.class}}</td>
+	<td> <a href='/Konfigurasi/DeleteOSD/{{i.name}}'>Delete</a></td>
+        </tr>
+        {% endfor %}
+        </tbody>
+        </table>
+
+        <h1>
+            Daftar MON
+        </h1><br>
+	<a href="/AddUser/form"> <button class="tombol"> + </button></a><br>
+	<table class="table table-striped table-sm">
+        <thead>
+	<tr>
+                  <th>Name</th>
+                  <th>Rank</th>
+		  <th>Address</th>
+        </tr>
+	</thead>
+	 {% for i in data.output.monmap.mons %}
+        <tr>
+	<tbody>
+        <td> {{i.name}}</td>
+        <td> {{i.rank}}</td>
+        <td> {{i.addr}}</td>
+        </tr>
+        {% endfor %}
+	</tbody>	
+	</table>
+	<h1>
+            Daftar MDS
+        </h1><br>
+	<a href="/AddUser/form"> <button class="tombol"> + </button></a><br>
+	 <table class="table table-striped table-sm">
+        <thead>
+        <tr>
+                  <th>Name</th>
+                  <th>State</th>
+                  <th>Address</th>
+        </tr>
+        </thead>
+         {% for i in datamds.output.fsmap.standbys %}
+        <tr>
+        <tbody>
+        <td> {{i.name}}</td>
+        <td> {{i.state}}</td>
+        <td> {{i.addr}}</td>
+        </tr>
+        {% endfor %}
+        </tbody>
+        </table>
+
+    {% endblock %}
+
+
+</body>
+</html>
+

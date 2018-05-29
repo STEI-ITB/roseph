@@ -1,0 +1,23 @@
+[ceph_deploy.cli]
+admin = ceph_deploy.admin:make
+calamari = ceph_deploy.calamari:make
+config = ceph_deploy.config:make
+disk = ceph_deploy.osd:make_disk
+forgetkeys = ceph_deploy.forgetkeys:make
+gatherkeys = ceph_deploy.gatherkeys:make
+install = ceph_deploy.install:make
+mds = ceph_deploy.mds:make
+mgr = ceph_deploy.mgr:make
+mon = ceph_deploy.mon:make
+new = ceph_deploy.new:make
+osd = ceph_deploy.osd:make
+pkg = ceph_deploy.pkg:make
+purge = ceph_deploy.install:make_purge
+purgedata = ceph_deploy.install:make_purge_data
+repo = ceph_deploy.repo:make
+rgw = ceph_deploy.rgw:make
+uninstall = ceph_deploy.install:make_uninstall
+
+[console_scripts]
+ceph-deploy = ceph_deploy.cli:main
+

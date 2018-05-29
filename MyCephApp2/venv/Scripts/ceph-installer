@@ -1,0 +1,6 @@
+#!C:\Users\Asus\PycharmProjects\MyProjectCeph\venv\Scripts\python.exe
+
+from ceph_installer.cli import main
+
+if __name__ == '__main__':
+    main.CephInstaller()

@@ -1,0 +1,4 @@
+
+    [pecan.extension]
+    notario = pecan_notario
+    

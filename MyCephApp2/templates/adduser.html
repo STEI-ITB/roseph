@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+{% extends 'layout.html' %}
+<head>
+    <meta charset="UTF-8">
+    <title>Judul</title>
+    <style>
+        .tombol {
+          padding: 15px 25px;
+          font-size: 32px;
+          text-align: center;
+          cursor: pointer;
+          outline: none;
+          color: #fff;
+          background-color: #4CAF50;
+          border: none;
+          border-radius: 15px;
+          box-shadow: 0 9px #999;
+        }
+
+        .tombol:hover {background-color: #3e8e41}
+
+        .tombol:active {
+          background-color: #3e8e41;
+          box-shadow: 0 5px #666;
+          transform: translateY(4px);
+        }
+
+        .danger {background-color: #f44336;} /* Red */
+        .danger:hover {background: #da190b;}
+    </style>
+<body>
+    {% block body %}
+        <div class="jumbotron text-center">
+                <div class="container">
+                  <h1 class="display-3">Gunakan Lorem Ipsum</h1>
+                  <p>Untuk membuat user.</p>
+                </div>
+              </div>
+
+        <h1>
+            Daftar pengguna
+        </h1>
+ <a href="/AddUser/form"> <button class="tombol"> + </button></a>
+
+        <ul class="list-group">
+
+          <div class="table-responsive">
+            <table class="table table-striped table-sm">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Key</th>
+                  <th>OSD</th>
+                  <th>MON</th>
+                  <th>MDS</th>
+                    <th>EDIT</th>
+                  <th>DEL</th>
+		  <th></th>
+                </tr>
+              </thead>
+                <tbody>
+                {% for datum in data.output.auth_dump %}
+                {% if datum.entity[:6]=="client"%}
+                {% if (datum.entity !="client.admin") and datum.entity[:16] !="client.bootstrap" %}
+                <tr>
+                    <td id="user">{{datum.entity}}</td>
+                    <td>{{datum.key}}</td>
+                    <td>{{datum.caps.osd}}</td>
+                    <td>{{datum.caps.mon}}</td>
+                    <td>{{datum.caps.mds}}</td>
+                    <td> <a href="/AddUser/EditUser/{{datum.entity}}"> Edit </a></td>
+                    <td> <a href="/AddUser/DelUser/{{datum.entity}}"> Delete </a></td>
+		   <td> <a href="/KirimContohKeyring/{{datum.entity[7:]}}/{{datum.key}}" target="blank"><button class='btn btn-default'>Download keyring</button></a></td>
+                </tr>
+                {% endif %}
+                {% endif %}
+                {% endfor %}
+        </tbody>
+        </ul>
+    <br>
+	{%endblock%}
+    <a href="/AddUser/form"> <button class="tombol"> + </button></a>
+
+
+</body>
+</html>

@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+{% extends 'layout.html' %}
+<head>
+    <meta charset="UTF-8">
+    <title>Judul</title>
+</head>
+<body>
+
+    {% block body %}
+    <div class="jumbotron text-center">
+        <div class="container">
+            <h1 class="display-3">Menampilkan</h1>
+            <p>Pools dan Image</p>
+            </div>
+    </div>
+    <div> <h1> Daftar Pool </h1>
+    <a href="/VolumeList/formpool"> <button class="tombol"> + </button></a>
+        <table class="table table-striped table-sm">
+              <thead>
+                <tr>
+                  <th>Pool ID</th>
+                  <th>Pool name</th>
+                  <th>Recovery rate</th>
+                  <th>Client I/O rate</th>
+                  <th>Recovery</th>
+                    <th>Edit</th>
+                    <th>Delete</th>
+                </tr>
+              </thead>
+               <tbody >
+
+                {% for datum in data.output %}
+                <tr>
+                    <td id="user">{{datum.pool_id}}</td>
+                    <td>{{datum.pool_name}}</td>
+                    <td>{{datum.recovery_rate}}</td>
+                    <td>{{datum.client_io_rate}}</td>
+                    <td>{{datum.recovery}}</td>
+                    <td> <a href="/VolumeList/EditPool/{{datum.pool_name}}"> Edit </a></td>
+                    <td> <a href="/VolumeList/DelPool/{{datum.pool_name}}"> Delete </a></td>
+                </tr>
+                {% endfor %}
+               </tbody>
+        </table>
+    </div>
+    <div>
+   <h1> Daftar Block Image </h1>
+    <a href="/VolumeList/formimage"> <button class="tombol"> + </button></a>
+
+    <table class="table table-striped table-sm">
+          <thead>
+            <tr>             
+              <th>Image name</th>
+              <th>Capacity (GB)</th> 
+		<th>Pool Source<th>
+                <th>Edit</th>
+                <th>Delete</th>
+            </tr>
+          </thead>
+           <tbody >
+
+            {% for i in dict %}
+            <tr>
+                <td>{{i.namaimage}}</td>
+                <td>{{i.size}}</td>
+                <td>{{i.namapool}}</td>
+		<td> </td>
+                <td> <a href="/VolumeList/EditVolume/{{i.namaimage}}/{{i.namapool}}">Edit</a></td>
+		<td> <a href="/VolumeList/DelVolume/{{i.namaimage}}/{{i.namapool}}">Delete</a></td>
+            </tr>
+            {% endfor %}
+           </tbody>
+    </table>
+    </div>
+    {% endblock %}
+</body>
+</html>

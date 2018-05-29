@@ -1,0 +1,31 @@
+<!doctype html>
+
+{% extends 'layout.html' %}
+
+{% block body %}
+<body>
+ <div class="jumbotron text-center">
+        <div class="container">
+          <h1 class="display-3">Gunakan Ceph</h1>
+          <p>Untuk memantau kondisi</p>
+        </div>
+      </div>
+<p id="test"></p>
+<a href="/Kirim" target="blank"><button class='btn btn-default'>Download!</button></a>
+
+ <div class="panel panel-primary">
+      <div class="panel-heading cd-collapsable">
+        <h3 class="panel-title">
+	Kondisi Cluster fsid {{data1.output.fsid}} : {{data.output.status}} <br><br>	
+	Keterpakaian 	: {{datum}}% <br><br>
+	</p>
+        </h3>
+      </div>
+</div>
+
+
+</body>
+
+
+
+{% endblock %}

@@ -1,0 +1,4 @@
+
+        [pecan.command]
+        populate=ceph_installer.commands.populate:PopulateCommand
+        
