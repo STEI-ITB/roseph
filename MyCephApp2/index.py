@@ -57,7 +57,7 @@ class TambahOSD(Form):
     journal = StringField('Device untuk Journal - Opsional')
     submit = SubmitField()
 
-@app.route('/')
+@app.route('/Dashboard')
 def index():
     r = requests.get('http://10.10.6.1:5000/api/v0.1/health.json')
     r1 = requests.get('http://10.10.6.1:5000/api/v0.1/fsid.json')
