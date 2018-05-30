@@ -9,6 +9,7 @@ from blockdevice import PilihCapsMon, PilihCapsOsd, PilihCapsMds
 from blockdevice import newImage, newPool, list_image, image_info, editImage, deleteImage
 import subprocess
 import yaml
+import optparse
 
 app = Flask(__name__)
 cors = CORS(app, resources={r"10.10.6.1:5000/api/v0.1/*": {"Access-Control-Allow-Origin": "*"}})
@@ -213,12 +214,19 @@ def delblock(namapool,namaimage):
 @app.route('/Konfigurasi', methods = ['GET','POST','PUT'])
 def konfig():
     r1=requests.get('http://10.10.6.1:5000/api/v0.1/mon_status.json',headers=headers)
+    data = json.loads(r1.text)
+    for list in data["output"]["monmap"]["mons"]:
+	ip = list["addr"].split(":")
+	list["addr"] = ip[0]
     r2=requests.get('http://10.10.6.1:5000/api/v0.1/mds/stat.json',headers=headers)
     r3=requests.get('http://10.10.6.1:5000/api/v0.1/osd/crush/dump.json', headers=headers)
-    return render_template('konfig.html',data =json.loads(r1.text),datamds=json.loads(r2.text), dataosd=json.loads(r3.text))
+    return render_template('konfig.html',data =data,datamds=json.loads(r2.text), dataosd=json.loads(r3.text))
 
-#@app.route('/Konfigurasi/DeleteOSD/<string:namaosd>')
-#def delOSD(namaosd):
+@app.route('/Konfigurasi/DeleteOSD/<string:namaosd>')
+def delOSD(namaosd):
+    bashCommand = 'ansible-playbook -e "ireallymeanit=yes osd_to_kill={}" ../ceph-ansible/shrink-osd.yml'.format(namaosd)
+    output = subprocess.check_output(['bash','-c', bashCommand])   
+    return redirect('/Konfigurasi')
 	
 @app.route('/Konfigurasi/TambahOSD', methods = ['GET','POST'])
 def addOSD():
@@ -254,6 +262,34 @@ def addOSD():
     elif request.method == 'GET':
         return render_template('addosd.html', form=form)
 
+@app.route('/Konfigurasi/DelMon/<string:namamon>')
+def DelMon(namamon):
+    bashCommand = 'ansible-playbook -e "ireallymeanit=yes mon_to_kill={}" ../ceph-ansible/shrink-mon.yml'.format(namamon)
+    output = subprocess.check_output(['bash','-c', bashCommand])
+    return redirect('/Konfigurasi')
+
+@app.route('/Konfigurasi/AddMon', methods = ['GET', 'POST'])
+def AddMon():
+    form = TambahOSD(request.form)
+    if request.method == 'POST':
+        if form.validate() == False:
+            return render_template('addmon.html',form=form)
+        else:
+            #daftarkan IP node baru di /etc/ansible/hosts
+            file = open('/home/tasds/roseph/ceph-ansible/hosts2','r')
+            lines = file.readlines()
+            file.close()
+            file = open('/home/tasds/roseph/ceph-ansible/hosts2','w')
+            for line in lines:
+		if line != form.ip_addr.data:
+			file.write(line)
+	    file.close()
+	    #jalankan bash ansible
+	    bashCommand = 'ansible-playbook ../ceph-ansible/site-mon.yml'
+	    output = subprocess.check_output(['bash','-c', bashCommand])
+	    return redirect('/Konfigurasi')
+    if request.method == 'GET':
+	return render_template('addmon.html',form=form)
 
 @app.route('/Kirim', methods = ['GET','POST'])
 def cephconf():

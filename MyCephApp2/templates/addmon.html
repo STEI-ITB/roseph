@@ -10,16 +10,13 @@
         </div>
       </div>
 
-      <form action = "http://10.10.6.254:8000/Konfigurasi/TambahOSD" method = post>
+      <form action = "http://10.10.6.254:8000/Konfigurasi/AddMon" method = post>
 
          <fieldset>
             {{ form.hidden_tag() }}
 
             <div style = font-size:20px>
                	 {{ form.ip_addr.label }} : {{ form.ip_addr }} <br>
-		 {{ form.device.label }} : {{ form.device }} <br>
-		 {{ form.isjournal.label }}? {{ form.isjournal }} <br>
- 		 {{ form.journal.label }} : {{ form.journal }} <br>
 	   	 {{form.submit}}
             </div>
          </fieldset>
