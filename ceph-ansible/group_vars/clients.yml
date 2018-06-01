@@ -11,12 +11,12 @@ dummy:
 # GENERAL #
 ###########
 
-#copy_admin_key: false
+copy_admin_key: true
 
 #user_config: false
 
-azizi:
-   name: "azizi"
+nextcloud:
+   name: "nextcloud"
    pg_num: "{{ hostvars[groups[mon_group_name][0]]['osd_pool_default_pg_num'] }}"
    pgp_num: "{{ hostvars[groups[mon_group_name][0]]['osd_pool_default_pg_num'] }}"
    rule_name: "replicated_rule"
@@ -40,8 +40,8 @@ azizi:
 #  type: "replicated"
 #  erasure_profile: ""
 #  expected_num_objects: ""
-#pools:
-#  - "{{ test }}"
+pools:
+  - "{{ nextcloud }}"
 #  - "{{ test2 }}"
 
 # Can add `mds_cap` attribute to override the default value which is '' for mds capabilities.
@@ -54,7 +54,7 @@ azizi:
 #  or
 #  $ python2 -c "import os ; import struct ; import time; import base64 ; key = os.urandom(16) ; header = struct.pack('<hiih',1,int(time.time()),0,len(key)) ; print base64.b64encode(header + key)"
 keys:
-   - { name: client.azizi, key: "{{ client_key }}", mon_cap: "allow r", osd_cap: "allow class-read object_prefix rbd_children, allow rwx pool=test", mode: "0600", acls: [] }
+   - { name: client.nextcloud, key: "{{ client_key }}", mon_cap: "allow r", osd_cap: "allow class-read object_prefix rbd_children, allow rwx pool=nextcloud", mode: "0600", acls: [] }
 
 #  - { name: client.test, key: "ADD-KEYRING-HERE==", mon_cap: "allow r", osd_cap: "allow class-read object_prefix rbd_children, allow rwx pool=test", mode: "0600", acls: [] }
 #  - { name: client.test2, key: "ADD-KEYRING-HERE==", mon_cap: "allow r", osd_cap: "allow class-read object_prefix rbd_children, allow rwx pool=test2", mode: "0600", acls: [] }

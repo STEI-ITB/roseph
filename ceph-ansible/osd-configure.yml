@@ -13,7 +13,7 @@
     - ceph-defaults
     - ceph-fetch-keys
 
-- hosts: tasds3
+- hosts: osds
   become: True
   roles:
     - ceph-defaults
