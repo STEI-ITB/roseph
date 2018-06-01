@@ -129,7 +129,13 @@
        with_items:
           - config
           - apps
-
+          
+     - name: move data directory with RBD
+       local_action: command mv '{{data_dir}}' /mnt/nextcloud-data/
+     
+     - name: link data directory with RBD
+       local_action: command ln -s '{{data_dir}}' /mnt/nextcloud-data/
+     
      - name: bring nextcloud.conf in place
        template:
          src: nextcloud.conf.j2
