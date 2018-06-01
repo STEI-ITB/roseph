@@ -1,3 +1,8 @@
+#MyCephApp merupakan aplikasi untuk memudahkan deployment dan operasional bagi sistem penyimpanan Ceph
+#Kontributor: Ghazy Mahendra, Alfian Azizi, Andrew Filbert D
+#Versi 0.95 (1 Juni 2018)
+
+#Mengimpor fungsi-fungsi dari library lain
 from flask import Flask, request, render_template, flash, redirect, send_file
 import requests
 import json
@@ -11,6 +16,7 @@ import subprocess
 import yaml
 import optparse
 
+#persiapan program
 app = Flask(__name__)
 cors = CORS(app, resources={r"10.10.6.1:5000/api/v0.1/*": {"Access-Control-Allow-Origin": "*"}})
 app.config['CORS_HEADERS'] = 'Content-Type'
@@ -24,6 +30,7 @@ headers = {'Access-Control-Max-Age' : '3600',
            'Access-Control-Allow-Headers': 'DNT,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Range',
            'Access-Control-Expose-Headers': 'Content-Length'}
 
+#Definisi kelas untuk form, dibuat mengunakan flask-wtf
 class BuatUser(Form):
     userID = StringField('userID')
     OSDr   = BooleanField('read')
@@ -76,11 +83,21 @@ class purgeform(Form):
    ireallymeanit = StringField('Tulis yes untuk konfirmasi')
    submit = SubmitField('Hapus')
 
-
+#Modul Started
+#Tujuan: Menerima pengguna sistem sebelum sistem berjalan, memberikan opsi untuk deployment sistem baru dan purging sistem lama
+#	 juga memberi keterangan tentang modul-modul lain
+#Masukan: None
+#Luaran : Laman
 @app.route('/')
 def started():
 	return render_template('starting.html')
 
+#Modul Deployment
+#Tujuan: Melakukan instalasi awal untuk komputer baremetal hingga sistem dapat dijalankan dan dipantau
+#Masukan: Release ver, IP monitor, IP osd, public network, cluster network, jenis osd, IP RGW, alamat device, penggunaan jurnal
+#	 alamat jurnal
+#Luaran : Laman dan deployment
+#Keterangan : Deployment memakan waktu lama
 @app.route('/Deploy', methods = ['GET', 'POST'])
 def deploy():
     form = deployform(request.form)
@@ -142,7 +159,11 @@ def deploy():
 	   return redirect('/')
     elif request.method == 'GET':
 	   return render_template('deploy.html', form=form)
-
+	
+#Modul Purging
+#Tujuan : Melakukan penghapusan terhadap sistem penyimpanan yang sudah ada
+#Masukan : checkbox x2 dan 1 string konfirmasi
+#Luaran  : laman dan sistem terhapus
 @app.route('/Purge', methods = ['GET', 'POST'])
 def purge():
     form = purgeform(request.form)
@@ -158,7 +179,10 @@ def purge():
 	 return render_template('purge.html', form=form)
 
 
-
+#Modul Dashboard
+#Tujuan : Melakukan penampilan data untuk memantau kondisi cluster secara umum
+#Masukan : none
+#Luaran  : laman (kondisi cluster, keterpakaian cluster)
 @app.route('/Dashboard')
 def index():
     r = requests.get('http://10.10.6.1:5000/api/v0.1/health.json')
@@ -168,16 +192,28 @@ def index():
     datapersen =math.ceil((pgstat['output']['raw_bytes_used'])/(pgstat['output']['raw_bytes_avail'])*100)
     return render_template('home.html',datum=datapersen,data =json.loads(r.text),data1=json.loads(r1.text),headers=headers)
 
+#Modul Daftar Pengguna
+#Tujuan : Melakukan penampilan data untuk memantau pengguna dan kapabilitasnya
+#Masukan : none
+#Luaran  : laman (ID, Keyring, Kapabilitas)
 @app.route('/AddUser')
 def adduser():
     r = requests.get('http://10.10.6.1:5000/api/v0.1/auth/list.json')
     return render_template('adduser.html', data =json.loads(r.text),headers=headers)
 
+#Modul Hapus Pengguna
+#Tujuan : Melakukan penghapusan pengguna tertentu
+#Masukan : Nama pengguna
+#Luaran  : none (updated db)
 @app.route('/AddUser/DelUser/<string:entity>', methods = ['GET','PUT'])
 def deluser(entity):
     requests.put('http://10.10.6.1:5000/api/v0.1/auth/del', params={"entity":entity},headers=headers)
     return redirect('/AddUser')
 
+#Modul Tambah Pengguna
+#Tujuan : Melakukan penambahan pengguna
+#Masukan : Nama pengguna dan kapabilitas
+#Luaran  : laman (updated db)
 @app.route('/AddUser/form', methods = ['GET','POST','PUT'])
 def adduserform():
     form = BuatUser(request.form)
@@ -201,6 +237,10 @@ def adduserform():
     elif request.method == 'GET':
         return render_template('form.html', form=form)
 
+#Modul Sunting Pengguna
+#Tujuan : Melakukan penyuntingan pengguna yang telah ada
+#Masukan : Nama pengguna dan kapabilitas
+#Luaran  : laman (updated db)
 @app.route('/AddUser/EditUser/<string:entity>', methods = ['GET','POST','PUT'])
 def edituser(entity):
     form = BuatUser(request.form)
@@ -226,6 +266,10 @@ def edituser(entity):
     elif request.method == 'GET':
         return render_template('formedit.html', form=form, entity=entity)
 
+#Modul Daftar Volume
+#Tujuan : Melakukan penampilan data untuk memantau pool yang ada di sistem serta block volume yang ada di pool
+#Masukan : None
+#Luaran  : Laman (Pool Id, pool name, recovery rate, client i/o rate, recovery, Image name, capacity,dan pool source)
 @app.route('/VolumeList',methods = ['GET','POST'])
 def volumelist():
     r = requests.get('http://10.10.6.1:5000/api/v0.1/osd/pool/stats.json',headers=headers)
@@ -248,6 +292,10 @@ def volumelist():
 	    list_dict.append(dict.copy())
     return render_template('addvolume.html', data=json.loads(r.text), dict=list_dict)
 
+#Modul Tambah Pool
+#Tujuan : Melakukan penambahan pool baru
+#Masukan : Nama pool, PG number, dan PGP number
+#Luaran  : laman (updated db)
 @app.route('/VolumeList/formpool',methods=['GET','POST','PUT'])
 def formpool():
     form = BuatPool(request.form)
@@ -261,6 +309,10 @@ def formpool():
     elif request.method == 'GET':
    	 return render_template('formpool.html', form=form)	
 
+#Modul Tambah Image
+#Tujuan : Melakukan penambahan block image baru
+#Masukan : Nama pool, nama image, dan kapasitas
+#Luaran  : laman (updated db)
 @app.route('/VolumeList/formimage',methods=['GET','POST','PUT'])
 def formimage():
     form = BuatImage(request.form)
@@ -279,6 +331,10 @@ def formimage():
     if request.method == 'GET' :
         return render_template('formimage.html', form=form)
 
+#Modul Sunting Pool
+#Tujuan : Melakukan penyuntingan PG dan PGP number dari pool yang ada
+#Masukan : Nama pool, PG number, dan PGP number
+#Luaran  : laman (updated db)
 @app.route('/VolumeList/EditPool/<string:poolname>', methods = ['GET','PUT','POST'])
 def editpool(poolname):
     form = BuatPool(request.form)
@@ -293,11 +349,19 @@ def editpool(poolname):
     elif request.method == 'GET':
         return render_template('editpool.html', form=form, poolname=poolname)
 
+#Modul Hapus Pool
+#Tujuan : Melakukan penghapusan ke pool yang ada 
+#Masukan : Nama pool
+#Luaran : none (updated db)
 @app.route('/VolumeList/DelPool/<string:poolname>', methods = ['GET','PUT'])
 def delpool(poolname):
     requests.put('http://10.10.6.1:5000/api/v0.1/osd/pool/delete', params={"pool":poolname,"pool2":poolname, "sure":"--yes-i-really-really-mean-it"},headers=headers)
     return redirect('/VolumeList')
 
+#Modul Sunting Image
+#Tujuan : Melakukan penyuntingan dari image yang sudah ada
+#Masukan : nama image, kapasitas dan nama pool tempat adanya image tersebut
+#Luaran  : laman (updated db)
 @app.route('/VolumeList/EditVolume/<string:namaimage>/<string:namapool>', methods=['GET','POST'])
 def editblock(namaimage,namapool):
     form = BuatImage(request.form)
@@ -308,11 +372,19 @@ def editblock(namaimage,namapool):
     elif request.method == 'GET':
         return render_template('formeditimage.html', form=form,namaimage=namaimage,namapool=namapool)
 
+#Modul Hapus Image
+#Tujuan : Melakukan penghapusan dari image yang sudah ada
+#Masukan : nama image dan nama pool tempat adanya image tersebut
+#Luaran  : none (updated db)
 @app.route('/VolumeList/DelVolume/<string:namaimage>/<string:namapool>', methods=['GET'])
 def delblock(namapool,namaimage):
     deleteImage(namapool,namaimage)
     return redirect('/VolumeList')
 
+#Modul Konfigurasi Sistem
+#Tujuan : Melakukan tampilan kondisi daemon dalam kluster
+#Masukan : none
+#Luaran  : Laman (tabel OSD[name, id, class] dan tabel MON[name, rank, address])
 @app.route('/Konfigurasi', methods = ['GET','POST','PUT'])
 def konfig():
     r1=requests.get('http://10.10.6.1:5000/api/v0.1/mon_status.json',headers=headers)
@@ -324,12 +396,21 @@ def konfig():
     r3=requests.get('http://10.10.6.1:5000/api/v0.1/osd/crush/dump.json', headers=headers)
     return render_template('konfig.html',data =data,datamds=json.loads(r2.text), dataosd=json.loads(r3.text))
 
+#Modul Hapus OSD
+#Tujuan : Melakukan penghapusan OSD yang telah ada
+#Masukan : nama OSD
+#Luaran  : none (updated db)
+#Keterangan : OSD yang telah dihapus tidak dapat langsung digunakan kembali 
 @app.route('/Konfigurasi/DeleteOSD/<string:namaosd>')
 def delOSD(namaosd):
     bashCommand = 'ansible-playbook -e "ireallymeanit=yes osd_to_kill={}" ../ceph-ansible/shrink-osd.yml'.format(namaosd)
     output = subprocess.check_output(['bash','-c', bashCommand])   
     return redirect('/Konfigurasi')
-	
+
+#Modul Tambah OSD
+#Tujuan : Melakukan penambahan OSD baru (scaling up)
+#Masukan : Alamat ip osd, alamat devais, alamat jurnal jika ada
+#Luaran  : laman (updated db)
 @app.route('/Konfigurasi/TambahOSD', methods = ['GET','POST'])
 def addOSD():
     form = TambahOSD(request.form)
@@ -366,12 +447,20 @@ def addOSD():
     elif request.method == 'GET':
         return render_template('addosd.html', form=form)
 
+#Modul Hapus Monitor
+#Tujuan : Melakukan penghapusan dari monitor yang sudah ada
+#Masukan : nama monitor 
+#Luaran  : none (updated db)
 @app.route('/Konfigurasi/DelMon/<string:namamon>')
 def DelMon(namamon):
     bashCommand = 'ansible-playbook -e "ireallymeanit=yes mon_to_kill={}" ../ceph-ansible/shrink-mon.yml'.format(namamon)
     output = subprocess.check_output(['bash','-c', bashCommand])
     return redirect('/Konfigurasi')
 
+#Modul Penambahan Monitor
+#Tujuan : Melakukan penambahan monitor baru
+#Masukan : alamat ip
+#Luaran  : laman (updated db)
 @app.route('/Konfigurasi/AddMon', methods = ['GET', 'POST'])
 def AddMon():
     form = TambahOSD(request.form)
@@ -395,10 +484,18 @@ def AddMon():
     if request.method == 'GET':
 	return render_template('addmon.html',form=form)
 
+#Modul Ceph.conf
+#Tujuan : Melakukan pengiriman ceph.conf dari sistem agar dapat didownload
+#Masukan : none
+#Luaran  : ceph.conf
 @app.route('/Kirim', methods = ['GET','POST'])
 def cephconf():
     return send_file('/etc/ceph/ceph.conf',attachment_filename='ceph.conf')
 
+#Modul kirim keyring
+#Tujuan : Melakukan pengiriman keyringpengguna dari sistem agar dapat didownload
+#Masukan : nama pengguna
+#Luaran  : ceph.conf
 @app.route('/KirimContohKeyring/<string:client>/<string:keyring>', methods = ['GET', 'POST'])
 def clientkeyring(client,keyring):
     file = open('/home/tasds/{}.keyring'.format(client),'w+')
