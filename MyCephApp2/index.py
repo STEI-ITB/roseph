@@ -58,17 +58,24 @@ class TambahOSD(Form):
     submit = SubmitField()
 
 class deployform(Form):
-    release = SelectField('Versi Ceph yang digunakan')
+    release = SelectField('Versi Ceph yang digunakan', choices=[('jewel','jewel'),('luminous','luminous')])
     ipmon   = StringField('IP komputer monitor')
     iposd   = StringField('IP komputer OSD')
     pubnet  = StringField('Alamat IP jaringan publik')
     clnet   = StringField('Alamat IP jaringan cluster')
-    osdtype = SelectField('Jenis OSD')
+    osdtype = SelectField('Jenis OSD', choices=[('FileStore','FileStore'),('BlueStore','BlueStore')])
     rgw_addr= StringField('Alamat Rados Gateway')
     device  = StringField('Device untuk OSD Baru')
     isjournal = BooleanField('Menggunakan Journal')
     journal = StringField('Device untuk Journal - Opsional')
     submit = SubmitField()
+
+class purgeform(Form):
+   yakin1 = BooleanField('Apakah Anda yakin menghapus cluster ini?')
+   yakin2 = BooleanField('Apakah Anda sudah mengamankan data penting pada cluster ini?')
+   ireallymeanit = StringField('Tulis yes untuk konfirmasi')
+   submit = SubmitField('Hapus')
+
 
 @app.route('/')
 def started():
@@ -77,54 +84,56 @@ def started():
 @app.route('/Deploy', methods = ['GET', 'POST'])
 def deploy():
     form = deployform(request.form)
-    if requests.method == 'POST':
+    if request.method == 'POST':
 	if form.validate() == False:
            return render_template('deploy.html', form=form)
         else:
 	   #edit all.yml menggunakan pyyaml	
 	   stream = open('../ceph-ansible/group_vars/all.yml','r')
 	   allyml = yaml.load(stream)
-	   allyml.ceph_stable_release = form.release.data
-	   allyml.monitor_address = form.ipmon.data
-	   allyml.public_network = form.pubnet.data
-	   allyml.cluster_network = form.clnet.data
-	   allyml.osd_objectstore = form.osdtype.data
-	   allyml.radosgw_address = form.rgw_addr.data
-	   stream = open('../ceph-ansible/group_vars/all.yml','w')
-	   yaml.dump(allyml,stream)
+	   allyml['ceph_stable_release'] = form.release.data
+	   allyml['monitor_address'] = form.ipmon.data
+           allyml['public_network'] =  form.pubnet.data
+	   allyml['cluster_network'] = form.clnet.data
+	   allyml['osd_objectstore'] = form.osdtype.data
+	   allyml['radosgw_address'] = form.rgw_addr.data
+	   with open('../ceph-ansible/group_vars/all.yml', 'w') as outfile:
+    		yaml.dump(allyml, outfile, default_flow_style=False)
 	   #edit osds.yml menggunakan pyyaml
            devices = form.device.data.split(',')
 	   stream = open('../ceph-ansible/group_vars/osds.yml','r')
            osds = yaml.load(stream)
-	   for device in devices:
-		osds["lvm_volumes"][device]["data"] = form.device.data
+	   counter = 0
+	   while counter < len(devices)-1:
+		osds["lvm_volumes"][counter]["data"] = form.device.data
 	    	if form.isjournal.data == False:
-		     osds["lvm_volumes"][device]["journal"] = form.device.data
+		     osds["lvm_volumes"][counter]["journal"] = form.device.data
 	    	else:
-		     osds["lvm_volumes"][device]["journal"] = form.journal.data  
-	   stream = open('../ceph-ansible/group_vars/osds.yml','w')
-	   yaml.dump(osds,stream)
+		     osds["lvm_volumes"][counter]["journal"] = form.journal.data
+	        counter = counter + 1  
+	   with open('../ceph-ansible/group_vars/osds.yml', 'w') as outfile:
+	 	yaml.dump(allyml, outfile, default_flow_style=False)
 	   #edit hosts2 dengan seluruh IP yang diberikan
 	   osd_ip = form.iposd.data.split(',')
 	   mon_ip = form.ipmon.data.split(',')
 	   file = open('/home/tasds/roseph/ceph-ansible/hosts2','w')
-           file.write('[mons]')
+           file.write('[mons]\n')
 	   for ip in mon_ip:
-		file.write(ip)
-	   file.write(' ')
-	   file.write('[osds]')
+		file.write(ip+'\n')
+	   file.write('\n')
+	   file.write('[osds]\n')
            for ip in osd_ip:
-                file.write(ip)
-	   file.write(' ')
-	   file.write('[mgrs]')
+                file.write(ip+'\n')
+	   file.write('\n ')
+	   file.write('[mgrs]\n')
            for ip in mon_ip:
                 file.write(ip)
-           file.write(' ')
-	   file.write('[mdss]')
+           file.write('\n ')
+	   file.write('[mdss]\n')
            for ip in mon_ip:
-                file.write(ip)
-           file.write(' ')
-	   file.write('[rgws]')
+                file.write(ip+'\n')
+           file.write('\n ')
+	   file.write('[rgws]\n')
 	   file.write(form.rgw_addr.data)
 	   file.close()
 	   #jalankan bash skrip ansible
@@ -136,7 +145,18 @@ def deploy():
 
 @app.route('/Purge', methods = ['GET', 'POST'])
 def purge():
-	return redirect('/')
+    form = purgeform(request.form)
+    if request.method == 'POST':
+        if form.validate() == False:
+            return render_template('purge.html', form=form)
+	else:
+	    if (form.yakin1.data and form.yakin2.data and (form.ireallymeanit.data == 'yes')):
+	         bashCommand = 'ansible-playbook ../ceph-ansible/purge-cluster.yml -e "ireallymeanit=yes"'
+           	 output = subprocess.check_output(['bash','-c', bashCommand])
+		 return redirect('/')
+    elif request.method == 'GET':
+	 return render_template('purge.html', form=form)
+
 
 
 @app.route('/Dashboard')

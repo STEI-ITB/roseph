@@ -1,0 +1,55 @@
+<!doctype html>
+
+{% extends 'layout.html' %}
+
+{% block body %}
+ <div class="jumbotron text-center">
+        <div class="container">
+          <h1 class="display-3">Instalasi Ceph</h1>
+          <p></p>
+        </div>
+      </div>
+
+      <f action = "http://10.10.6.254:8000/Deploy" method = post>
+         <fieldset>
+            {{ form.hidden_tag()}}
+	    <p> Instalasi akan memakan waktu kurang lebih 60 menit untuk 3 komputer. Harap tidak membatalkan proses hingga proses selesai </p> <br>
+            <div style = font-size:20px>
+               {{ form.release.label }} : 
+               {{ form.release }}
+               <br>
+		{{ form.ipmon.label }} : 
+               {{ form.ipmon }} Gunakan koma (',') untuk memisahkan ip
+	 	<br>
+		{{ form.iposd.label }} :
+               {{ form.iposd }} Gunakan koma (',') untuk memisahkan ip
+                <br>
+		{{ form.pubnet.label }} :
+               {{ form.pubnet }} Contoh (10.10.6.0/20)
+                <br>
+		{{ form.clnet.label }} :
+               {{ form.clnet }} Contoh (10.10.6.0/20)
+		<br>
+		{{ form.pubnet.label }} :
+               {{ form.pubnet }} Contoh (10.10.6.0/20)
+		 <br>
+                {{ form.osdtype.label }} :
+               {{ form.osdtype }}
+		 <br>
+                {{ form.rgw_addr.label }} :
+               {{ form.rgw_addr }} Contoh (10.10.6.1)
+		 <br>
+                {{ form.device.label }} :
+               {{ form.device }} Gunakan koma (',') untuk memisahkan, contoh (/dev/sda,/dev/sdb)
+		 <br>
+                {{ form.isjournal.label }} :
+               {{ form.isjournal }}
+		<br>
+               {{ form.journal.label }} :
+               {{ form.journal }} Gunakan koma (',') untuk memisahkan, contoh (/dev/sda,/dev/sdb)
+	<br>{{ form.submit}}
+            </div>
+         </fieldset>
+      </form>
+
+{% endblock %}

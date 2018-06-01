@@ -1,0 +1,27 @@
+<!doctype html>
+
+{% extends 'layout.html' %}
+
+{% block body %}
+ <div class="jumbotron text-center">
+        <div class="container">
+          <h1 class="display-3">PERHATIAN!</h1>
+          <p>Melakukan purging cluster Ceph akan mengakibatkan hilangnya data-data di sistem Anda! </p>
+        </div>
+      </div>
+
+      <form action = "http://10.10.6.254:8000/VolumeList/formpool" method = post>
+         <fieldset>
+            {{ form.hidden_tag() }}
+
+            <div style = font-size:20px>
+               <br>
+               {{ form.yakin1.label }} : {{ form.yakin1}} <br>
+               {{ form.yakin2.label }} : {{ form.yakin2}} <br>
+               {{ form.ireallymeanit.label }} : {{ form.ireallymeanit}}<br>
+              {{ form.submit }}
+            </div>
+         </fieldset>
+      </form>
+
+{% endblock %}
