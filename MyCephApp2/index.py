@@ -9,6 +9,7 @@ from blockdevice import PilihCapsMon, PilihCapsOsd, PilihCapsMds
 from blockdevice import newImage, newPool, list_image, image_info, editImage, deleteImage
 import subprocess
 import yaml
+import optparse
 
 app = Flask(__name__)
 cors = CORS(app, resources={r"10.10.6.1:5000/api/v0.1/*": {"Access-Control-Allow-Origin": "*"}})
@@ -56,7 +57,89 @@ class TambahOSD(Form):
     journal = StringField('Device untuk Journal - Opsional')
     submit = SubmitField()
 
+class deployform(Form):
+    release = SelectField('Versi Ceph yang digunakan')
+    ipmon   = StringField('IP komputer monitor')
+    iposd   = StringField('IP komputer OSD')
+    pubnet  = StringField('Alamat IP jaringan publik')
+    clnet   = StringField('Alamat IP jaringan cluster')
+    osdtype = SelectField('Jenis OSD')
+    rgw_addr= StringField('Alamat Rados Gateway')
+    device  = StringField('Device untuk OSD Baru')
+    isjournal = BooleanField('Menggunakan Journal')
+    journal = StringField('Device untuk Journal - Opsional')
+    submit = SubmitField()
+
 @app.route('/')
+def started():
+	return render_template('starting.html')
+
+@app.route('/Deploy', methods = ['GET', 'POST'])
+def deploy():
+    form = deployform(request.form)
+    if requests.method == 'POST':
+	if form.validate() == False:
+           return render_template('deploy.html', form=form)
+        else:
+	   #edit all.yml menggunakan pyyaml	
+	   stream = open('../ceph-ansible/group_vars/all.yml','r')
+	   allyml = yaml.load(stream)
+	   allyml.ceph_stable_release = form.release.data
+	   allyml.monitor_address = form.ipmon.data
+	   allyml.public_network = form.pubnet.data
+	   allyml.cluster_network = form.clnet.data
+	   allyml.osd_objectstore = form.osdtype.data
+	   allyml.radosgw_address = form.rgw_addr.data
+	   stream = open('../ceph-ansible/group_vars/all.yml','w')
+	   yaml.dump(allyml,stream)
+	   #edit osds.yml menggunakan pyyaml
+           devices = form.device.data.split(',')
+	   stream = open('../ceph-ansible/group_vars/osds.yml','r')
+           osds = yaml.load(stream)
+	   for device in devices:
+		osds["lvm_volumes"][device]["data"] = form.device.data
+	    	if form.isjournal.data == False:
+		     osds["lvm_volumes"][device]["journal"] = form.device.data
+	    	else:
+		     osds["lvm_volumes"][device]["journal"] = form.journal.data  
+	   stream = open('../ceph-ansible/group_vars/osds.yml','w')
+	   yaml.dump(osds,stream)
+	   #edit hosts2 dengan seluruh IP yang diberikan
+	   osd_ip = form.iposd.data.split(',')
+	   mon_ip = form.ipmon.data.split(',')
+	   file = open('/home/tasds/roseph/ceph-ansible/hosts2','w')
+           file.write('[mons]')
+	   for ip in mon_ip:
+		file.write(ip)
+	   file.write(' ')
+	   file.write('[osds]')
+           for ip in osd_ip:
+                file.write(ip)
+	   file.write(' ')
+	   file.write('[mgrs]')
+           for ip in mon_ip:
+                file.write(ip)
+           file.write(' ')
+	   file.write('[mdss]')
+           for ip in mon_ip:
+                file.write(ip)
+           file.write(' ')
+	   file.write('[rgws]')
+	   file.write(form.rgw_addr.data)
+	   file.close()
+	   #jalankan bash skrip ansible
+ 	   bashCommand = 'ansible-playbook ../ceph-ansible/site.yml'
+	   output = subprocess.check_output(['bash','-c', bashCommand])
+	   return redirect('/')
+    elif request.method == 'GET':
+	   return render_template('deploy.html', form=form)
+
+@app.route('/Purge', methods = ['GET', 'POST'])
+def purge():
+	return redirect('/')
+
+
+@app.route('/Dashboard')
 def index():
     r = requests.get('http://10.10.6.1:5000/api/v0.1/health.json')
     r1 = requests.get('http://10.10.6.1:5000/api/v0.1/fsid.json')
@@ -213,12 +296,19 @@ def delblock(namapool,namaimage):
 @app.route('/Konfigurasi', methods = ['GET','POST','PUT'])
 def konfig():
     r1=requests.get('http://10.10.6.1:5000/api/v0.1/mon_status.json',headers=headers)
+    data = json.loads(r1.text)
+    for list in data["output"]["monmap"]["mons"]:
+	ip = list["addr"].split(":")
+	list["addr"] = ip[0]
     r2=requests.get('http://10.10.6.1:5000/api/v0.1/mds/stat.json',headers=headers)
     r3=requests.get('http://10.10.6.1:5000/api/v0.1/osd/crush/dump.json', headers=headers)
-    return render_template('konfig.html',data =json.loads(r1.text),datamds=json.loads(r2.text), dataosd=json.loads(r3.text))
+    return render_template('konfig.html',data =data,datamds=json.loads(r2.text), dataosd=json.loads(r3.text))
 
-#@app.route('/Konfigurasi/DeleteOSD/<string:namaosd>')
-#def delOSD(namaosd):
+@app.route('/Konfigurasi/DeleteOSD/<string:namaosd>')
+def delOSD(namaosd):
+    bashCommand = 'ansible-playbook -e "ireallymeanit=yes osd_to_kill={}" ../ceph-ansible/shrink-osd.yml'.format(namaosd)
+    output = subprocess.check_output(['bash','-c', bashCommand])   
+    return redirect('/Konfigurasi')
 	
 @app.route('/Konfigurasi/TambahOSD', methods = ['GET','POST'])
 def addOSD():
@@ -247,6 +337,8 @@ def addOSD():
 		osds["lvm_volumes"][0]["journal"] = form.device.data
 	    else:
 		osds["lvm_volumes"][0]["journal"] = form.journal.data
+	    stream = open('/home/tasds/roseph/ceph-ansible/group_vars/osds.yml','w')
+	    yaml.dump(osds,stream)
             #jalankan bash shellnya
 	    bashCommand = "ansible-playbook /home/tasds/roseph/ceph-ansible/osd-configure.yml"
 	    output = subprocess.check_output(['bash','-c', bashCommand])
@@ -254,6 +346,34 @@ def addOSD():
     elif request.method == 'GET':
         return render_template('addosd.html', form=form)
 
+@app.route('/Konfigurasi/DelMon/<string:namamon>')
+def DelMon(namamon):
+    bashCommand = 'ansible-playbook -e "ireallymeanit=yes mon_to_kill={}" ../ceph-ansible/shrink-mon.yml'.format(namamon)
+    output = subprocess.check_output(['bash','-c', bashCommand])
+    return redirect('/Konfigurasi')
+
+@app.route('/Konfigurasi/AddMon', methods = ['GET', 'POST'])
+def AddMon():
+    form = TambahOSD(request.form)
+    if request.method == 'POST':
+        if form.validate() == False:
+            return render_template('addmon.html',form=form)
+        else:
+            #daftarkan IP node baru di /etc/ansible/hosts
+            file = open('/home/tasds/roseph/ceph-ansible/hosts2','r')
+            lines = file.readlines()
+            file.close()
+            file = open('/home/tasds/roseph/ceph-ansible/hosts2','w')
+            for line in lines:
+		if line != form.ip_addr.data:
+			file.write(line)
+	    file.close()
+	    #jalankan bash ansible
+	    bashCommand = 'ansible-playbook ../ceph-ansible/site-mon.yml'
+	    output = subprocess.check_output(['bash','-c', bashCommand])
+	    return redirect('/Konfigurasi')
+    if request.method == 'GET':
+	return render_template('addmon.html',form=form)
 
 @app.route('/Kirim', methods = ['GET','POST'])
 def cephconf():

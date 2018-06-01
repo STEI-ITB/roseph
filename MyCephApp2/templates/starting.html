@@ -1,0 +1,37 @@
+
+<!doctype html>
+
+{% extends 'layout.html' %}
+
+{% block body %}
+<body>
+
+ <br> <br>
+ <h2>
+	Instalasi
+ </h2>
+ <p>
+    Jika Anda memulai menggunakan Ceph sebagai solusi penyimpanan, Anda perlu melakukan instalasi software di server Anda. Laman lain di aplikasi ini tidak bisa Anda akses sebelum melakukan instalasi.
+  <ul>
+    <li><a href='/Deploy'>Deployment</a>
+      — jika Anda memulai dengan komputer kosong yang telah siap diinstal Ceph.
+    <li><a href='/Purge'>Purge</a>
+      — melakukan penghapusan sistem Ceph, jika Anda memulai dari sistem Ceph yang sudah pernah terinstal sebelumnya.
+  </ul>
+  <br>
+  <h2>Penjelasan</h2>
+  <p>Aplikasi ini didesain untuk memudahkan pemantauan sistem penyimpanan Ceph serta konfigurasi. Terdapat beberapa fungsi yang dapat digunakan pada aplikasi ini:
+  <ul>
+    <li><a href='/Dashboard'>Dashboard</a>
+      — Berisi kondisi cluster penyimpanan serta keterpakaian.
+    <li><a href='/AddUser'>Daftar Pengguna</a>
+      — Berisi daftar pengguna, kapabilitas pengguna, serta modul untuk menambah, menghapus, dan menyunting kapabilitas pengguna. 
+    <li><a href='/VolumeList'>Daftar Volume</a>
+      — Berisi daftar pool penyimpanan serta block image yang dapat digunakan serta atributnya.
+    <li><a href='/Konfigurasi'>Konfigurasi Sistem</a>
+      — Berisi daftar perangkat-perangkat yang digunakan dalam sistem.
+  </ul>
+
+
+{% endblock %}
+</body>
