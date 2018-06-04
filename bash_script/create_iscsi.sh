@@ -5,8 +5,9 @@ read -p "Nama Image: " image
 
 #Map RBD Device
 echo "Mapping RBD Devices From Ceph"
-#yrbd feature disable $pool/$image object-map fast-diff deep-flatten
+rbd feature disable $pool/$image object-map fast-diff deep-flatten
 block_device=$(rbd map $pool/$image)
+mkntfs -f $block_device
 
 #Install ISCI Target
 echo "Installing iSCSI Target"
