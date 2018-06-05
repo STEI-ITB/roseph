@@ -1,0 +1,83 @@
+iterasi ke-2
+ 
+hints = 1
+Maintaining 16 concurrent writes of 4194304 bytes to objects of size 4194304 for up to 10 seconds or 0 objects
+Object prefix: benchmark_data_tasds1_27495
+  sec Cur ops   started  finished  avg MB/s  cur MB/s last lat(s)  avg lat(s)
+    0       0         0         0         0         0           -           0
+    1      16        25         9    35.998        36    0.360073    0.480492
+    2      16        49        33   65.9927        96    0.866315    0.801641
+    3      16        62        46   61.3262        52     1.05691    0.773214
+    4      16        73        57   56.9934        44     1.63973    0.985075
+    5      16        84        68   54.3936        44     0.58964    0.980699
+    6      16       109        93   61.9926       100    0.468566    0.975975
+    7      16       131       115   65.7065        88    0.293574     0.91085
+    8      16       152       136   67.9921        84    0.617762    0.896883
+    9      16       169       153   67.9922        68    0.583607    0.882135
+   10      16       185       169   67.5923        64     1.21558    0.891529
+   11      16       185       169   61.4475         0           -    0.891529
+   12      16       186       170     56.66         2     2.10665    0.898677
+   13      13       186       173   53.2245        12     3.56074    0.939537
+Total time run:         13.097737
+Total writes made:      186
+Write size:             4194304
+Object size:            4194304
+Bandwidth (MB/sec):     56.8037
+Stddev Bandwidth:       34.3183
+Max bandwidth (MB/sec): 100
+Min bandwidth (MB/sec): 0
+Average IOPS:           14
+Stddev IOPS:            8
+Max IOPS:               25
+Min IOPS:               0
+Average Latency(s):     1.12058
+Stddev Latency(s):      0.872789
+Max latency(s):         4.85238
+Min latency(s):         0.200597
+ 
+hints = 1
+  sec Cur ops   started  finished  avg MB/s  cur MB/s last lat(s)  avg lat(s)
+    0       0         0         0         0         0           -           0
+    1      16        57        41   163.969       164    0.682893    0.270385
+    2      16        91        75   149.977       136  0.00473536    0.344222
+    3      16       123       107   142.646       128    0.187607    0.393287
+    4      16       165       149    148.98       168  0.00459054    0.390522
+    5      16       186       170   135.983        84    0.529818    0.401782
+Total time run:       5.108963
+Total reads made:     186
+Read size:            4194304
+Object size:          4194304
+Bandwidth (MB/sec):   145.626
+Average IOPS:         36
+Stddev IOPS:          8
+Max IOPS:             42
+Min IOPS:             21
+Average Latency(s):   0.434463
+Max latency(s):       1.18646
+Min latency(s):       0.00430298
+ 
+hints = 1
+  sec Cur ops   started  finished  avg MB/s  cur MB/s last lat(s)  avg lat(s)
+    0       0         0         0         0         0           -           0
+    1      16        55        39   155.973       156    0.396701    0.262884
+    2      16        99        83   165.974       176    0.539237    0.322728
+    3      15       137       122   162.643       156    0.147502    0.343821
+    4      16       175       159   158.979       148    0.622303    0.372215
+    5      16       210       194    155.18       140     1.02882    0.374913
+    6      16       256       240    159.98       184  0.00693941    0.372765
+    7      16       295       279   159.409       156    0.164549    0.373579
+    8      16       333       317   158.481       152     1.16048    0.382694
+    9      16       366       350   155.537       132    0.259516    0.386764
+   10      16       402       386   154.382       144    0.625985     0.40075
+Total time run:       10.570084
+Total reads made:     403
+Read size:            4194304
+Object size:          4194304
+Bandwidth (MB/sec):   152.506
+Average IOPS:         38
+Stddev IOPS:          3
+Max IOPS:             46
+Min IOPS:             33
+Average Latency(s):   0.416125
+Max latency(s):       1.4886
+Min latency(s):       0.00415438

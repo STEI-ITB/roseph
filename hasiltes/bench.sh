@@ -26,12 +26,13 @@ while [ $counter -le 3 ]; do
         hasil="$(sudo rados bench -p scbench 10 write --no-cleanup)"
         hasil2="$(sudo rados bench -p scbench 10 seq)"
         hasil3="$(sudo rados bench -p scbench 10 rand)"
-	echo "iterasi ke-$counter" >> $filename-iterasi$counter
-	echo " " >> $filename-iterasi$counter
+	echo "WRITE" >> $filename-iterasi$counter
         echo "$hasil" >> $filename-iterasi$counter
-        echo " " >> $filename-iterasi$counter
+	echo " " >> $filename-iterasi$counter
+        echo "Seq READ" >> $filename-iterasi$counter
         echo "$hasil2" >> $filename-iterasi$counter
         echo " " >> $filename-iterasi$counter
+	echo "Rand READ" >> $filename-iterasi$counter
         echo "$hasil3" >> $filename-iterasi$counter
         rados -p scbench cleanup
         counter=$(( $counter + 1 ))
