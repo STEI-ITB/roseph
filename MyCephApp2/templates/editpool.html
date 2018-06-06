@@ -1,0 +1,25 @@
+{% extends 'layout.html' %}
+
+{% block body %}
+ <div class="jumbotron text-center">
+        <div class="container">
+          <h1 class="display-3">Gunakan Ceph</h1>
+          <p>Untuk menambah jumlah pool</p>
+        </div>
+      </div>
+
+      <form action = "http://10.10.6.251:8000/VolumeList/EditPool/{{poolname}}" method = post>
+         <fieldset>
+            {{ form.hidden_tag() }}
+
+            <div style = font-size:20px>
+               <br>
+               Mengedit pool {{form.namaPool.data}} <br>
+               {{ form.PGnum.label }} : {{ form.PGnum}} <br>
+               {{ form.PGPnum.label }} : {{ form.PGPnum}}<br>
+              {{ form.submit }}
+            </div>
+         </fieldset>
+      </form>
+
+{% endblock %}
