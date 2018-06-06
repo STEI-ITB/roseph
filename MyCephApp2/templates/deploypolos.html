@@ -11,32 +11,22 @@
         </div>
       </div>
 <div>
-	<h1>Daftar Node</h1>
-	<a href="/Deploy/Addnode"><button class="tombol"> + </button></a>
-	 <a href='/Deploy/Reset'><button class='tombol'>Reset</button></a><br>
-	<table class="table table-striped table-sm">
+        <h1>Daftar Node</h1>
+        <a href="/Deploy/Addnode"><button class="tombol"> + </button></a>
+         <a href='/Deploy/Reset'><button class='tombol'>Reset</button></a><br>
+        <table class="table table-striped table-sm">
         <thead>
         <tr>
                   <th>Hostname</th>
                   <th>Alamat IP</th>
                   <th>MON</th>
-		  <th>OSD</th>
-		  <th>RGW</th>
-		  <th>Delete</th>
+                  <th>OSD</th>
+ <th>RGW</th>
+                  <th>Delete</th>
         </tr>
         </thead>
-	<tbody>
-	{% for i in hosts %}
-        <tr>
-        <td>{{i.hostname}} </td>
-        <td>{{i.ip_addr}} </td>
-        <td>{{i.ismon}} </td>
-	<td>{{i.isosd}} </td>
-	<td>{{i.isrgw}}</td>
-	<td><a href='/Deploy/Delete/{{i.hostname}}'> Delete</a></td>
-        </tr>
-	{%endfor%}
-	</tbody></table>
+        <tbody>
+        </tbody>
 </div>
 
 
@@ -45,29 +35,30 @@
       <f action = "http://10.10.6.254:8000/Deploy" method = post>
          <fieldset>
             {{ form.hidden_tag()}}
-	    <p> Instalasi akan memakan waktu kurang lebih 30 menit untuk 3 komputer. Harap tidak membatalkan proses hingga proses selesai. Semua node yang akan dijalankan OSD akan diinstal pada lokasi device yang telah disebutkan. </p> <br>
-		 <div style = font-size:20px>
-               {{ form.release.label }} : 
+            <p> Instalasi akan memakan waktu kurang lebih 60 menit untuk 3 komputer. Harap tidak membatalkan proses hingga proses selesai </p> <br>
+                 <div style = font-size:20px>
+               {{ form.release.label }} :
                {{ form.release }}
                <br>
-		{{ form.clnet.label }} :
+                {{ form.clnet.label }} :
                {{ form.clnet }} Contoh (10.10.6.0/20)
-		<br>
+                <br>
                 {{ form.osdtype.label }} :
                {{ form.osdtype }}
-		 <br>
+                 <br>
                 {{ form.device.label }} :
                {{ form.device }} Gunakan koma (',') untuk memisahkan, contoh (/dev/sda,/dev/sdb)
-		 <br>
+                 <br>
                 {{ form.isjournal.label }} :
                {{ form.isjournal }}
-		<br>
+                <br>
                {{ form.journal.label }} :
                {{ form.journal }} Gunakan koma (',') untuk memisahkan, contoh (/dev/sda,/dev/sdb)
-	<br>{{ form.submit}}
+        <br>{{ form.submit}}
             </div>
-         </fieldset>
+ </fieldset>
       </form>
 </div>
 </body>
 {% endblock %}
+

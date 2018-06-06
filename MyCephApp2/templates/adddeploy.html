@@ -1,0 +1,29 @@
+<!doctype html>
+
+{% extends 'layout.html' %}
+
+{% block body %}
+ <div class="jumbotron text-center">
+        <div class="container">
+          <h1 class="display-3">Tambah untuk deployment</h1>
+          <p></p>
+        </div>
+      </div>
+
+      <form action = "http://10.10.6.254:8000/Deploy/Addnode" method = post>
+
+         <fieldset>
+            {{ form.hidden_tag() }}
+
+            <div style = font-size:20px>
+		 {{ form.hostname.label}} : {{form.hostname}} <br>
+               	 {{ form.ip_addr.label }} : {{ form.ip_addr }} <br>
+		 {{ form.ismon.label }} : {{form.ismon}} <br>
+		 {{ form.isosd.label }} : {{form.isosd}} <br>
+		 {{ form.isrgw.label }} : {{form.isrgw}} <br>
+	   	 {{form.submit}}
+            </div>
+         </fieldset>
+      </form>
+
+{% endblock %}

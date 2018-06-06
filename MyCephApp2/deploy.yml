@@ -1,0 +1,20 @@
+- hostname: !!python/unicode 'Ozi'
+  ip_addr: !!python/unicode '175.10.64.221/26'
+  ismon: false
+  isosd: false
+  isrgw: false
+  netaddr: !!python/object:ipcalc.IP
+    dq: 175.10.64.192
+    ip: 2936684736
+    mask: 32
+    v: 4
+- hostname: !!python/unicode 'andrew'
+  ip_addr: !!python/unicode '175.10.64.221/26'
+  ismon: true
+  isosd: false
+  isrgw: false
+  netaddr: !!python/object:ipcalc.IP
+    dq: 175.10.64.192
+    ip: 2936684736
+    mask: 32
+    v: 4
