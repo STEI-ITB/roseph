@@ -1,0 +1,81 @@
+WRITE
+hints = 1
+Maintaining 16 concurrent writes of 4194304 bytes to objects of size 4194304 for up to 10 seconds or 0 objects
+Object prefix: benchmark_data_tasds1_5875
+  sec Cur ops   started  finished  avg MB/s  cur MB/s last lat(s)  avg lat(s)
+    0       0         0         0         0         0           -           0
+    1      16        28        12   47.9976        48    0.875417    0.633582
+    2      16        52        36   71.9939        96    0.908696     0.66225
+    3      16        69        53   70.6599        68     0.76193    0.687646
+    4      16        90        74   73.9929        84    0.629408    0.705973
+    5      16       108        92   73.5929        72     0.60613    0.746641
+    6      16       130       114   75.9926        88    0.359723    0.764867
+    7      16       147       131   74.8499        68    0.389615    0.780071
+    8      16       167       151   75.4926        80    0.857784    0.786042
+    9      16       186       170   75.5481        76     0.29212    0.789057
+   10      16       205       189   75.5924        76    0.219183    0.786363
+Total time run:         10.573539
+Total writes made:      206
+Write size:             4194304
+Object size:            4194304
+Bandwidth (MB/sec):     77.9304
+Stddev Bandwidth:       13.125
+Max bandwidth (MB/sec): 96
+Min bandwidth (MB/sec): 48
+Average IOPS:           19
+Stddev IOPS:            3
+Max IOPS:               24
+Min IOPS:               12
+Average Latency(s):     0.821102
+Stddev Latency(s):      0.53565
+Max latency(s):         2.66951
+Min latency(s):         0.176862
+ 
+Seq READ
+hints = 1
+  sec Cur ops   started  finished  avg MB/s  cur MB/s last lat(s)  avg lat(s)
+    0       0         0         0         0         0           -           0
+    1      16        59        43   171.967       172    0.672781    0.259896
+    2      16        97        81   161.973       152  0.00498412    0.311917
+    3      16       139       123   163.977       168    0.102713    0.340132
+    4      16       186       170   169.978       188  0.00625935    0.335847
+    5      11       206       195   155.981       100     1.08083    0.349541
+Total time run:       5.015285
+Total reads made:     206
+Read size:            4194304
+Object size:          4194304
+Bandwidth (MB/sec):   164.298
+Average IOPS:         41
+Stddev IOPS:          8
+Max IOPS:             47
+Min IOPS:             25
+Average Latency(s):   0.384842
+Max latency(s):       1.52335
+Min latency(s):       0.00424938
+ 
+Rand READ
+hints = 1
+  sec Cur ops   started  finished  avg MB/s  cur MB/s last lat(s)  avg lat(s)
+    0       0         0         0         0         0           -           0
+    1      16        58        42   167.979       168    0.542741    0.234829
+    2      16       103        87   173.978       180  0.00427657    0.285941
+    3      16       145       129    171.98       168  0.00477617     0.30725
+    4      16       181       165   164.982       144   0.0065216    0.349407
+    5      16       236       220   175.981       220    0.250944     0.32136
+    6      16       279       263   175.315       172  0.00444269    0.335116
+    7      16       323       307    175.41       176    0.281545    0.342228
+    8      16       372       356   177.982       196    0.143752    0.334599
+    9      16       408       392   174.205       144    0.656126    0.343828
+   10      16       450       434   173.582       168    0.604137    0.350252
+Total time run:       10.487949
+Total reads made:     451
+Read size:            4194304
+Object size:          4194304
+Bandwidth (MB/sec):   172.007
+Average IOPS:         43
+Stddev IOPS:          5
+Max IOPS:             55
+Min IOPS:             36
+Average Latency(s):   0.369975
+Max latency(s):       1.6913
+Min latency(s):       0.00411115
