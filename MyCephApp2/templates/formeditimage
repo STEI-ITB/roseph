@@ -1,0 +1,26 @@
+<!doctype html>
+
+{% extends 'layout.html' %}
+
+{% block body %}
+ <div class="jumbotron text-center">
+        <div class="container">
+          <h1 class="display-3">Gunakan Ceph</h1>
+          <p>Untuk menambah jumlah image</p>
+        </div>
+      </div>
+
+      <form action = "http://10.10.6.251:8000/VolumeList/EditVolume/{{namaimage}}/{{namapool}}" method = post>
+         <fieldset>
+            {{ form.hidden_tag() }}
+
+            <div style = font-size:20px>
+               <br>
+               Mengedit kapasitas image {{namaimage}}<br>
+               {{ form.kapasitas.label }} : {{ form.kapasitas}}<br>
+              {{ form.submit }}
+            </div>
+  </fieldset>
+      </form>
+
+{% endblock %}
