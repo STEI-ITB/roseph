@@ -15,6 +15,7 @@ from blockdevice import newImage, newPool, list_image, image_info, editImage, de
 import subprocess
 import yaml
 import optparse
+import ipcalc
 
 #persiapan program
 app = Flask(__name__)
@@ -77,6 +78,14 @@ class deployform(Form):
     journal = StringField('Device untuk Journal - Opsional')
     submit = SubmitField()
 
+class addnode(Form):
+    ip_addr = StringField('Alamat IP')
+    hostname= StringField('Nama Host')
+    ismon   = BooleanField('Digunakan sebagai MON?')
+    isosd   = BooleanField('Digunakan sebagai OSD?')
+    isrgw   = BooleanField('Digunakan sebagai RGW?')
+    submit = SubmitField()
+
 class purgeform(Form):
    yakin1 = BooleanField('Apakah Anda yakin menghapus cluster ini?')
    yakin2 = BooleanField('Apakah Anda sudah mengamankan data penting pada cluster ini?')
@@ -100,20 +109,46 @@ def started():
 #Keterangan : Deployment memakan waktu lama
 @app.route('/Deploy', methods = ['GET', 'POST'])
 def deploy():
+    stream = open('deploy.yml','r+')
+    hosts = []
+    if stream !='':
+        hosts = yaml.load(stream)
     form = deployform(request.form)
     if request.method == 'POST':
 	if form.validate() == False:
-           return render_template('deploy.html', form=form)
+           return render_template('deploy.html', form=form, hosts=hosts)
         else:
+	   #Persiapkan data yang akan dimasukkan ke all.yml
+	   c = 0
+	   monip = ''
+	   osdip = ''
+	   rgwip = ''
+	   while c != len(hosts):
+		if hosts[c]['ismon']:
+			if monip == '':
+				monip = hosts['ip_addr']
+			else:
+				monip = monip+','+hosts['ip_addr']
+                if hosts[c]['isosd']:
+                        if osdip == '':
+                                osdip = hosts['ip_addr']
+                        else:
+                                osdip = osdip+','+hosts['ip_addr']
+                if hosts[c]['isrgw']:
+                        if rgwip == '':
+                                rgwip = hosts['ip_addr']
+                        else:
+                                rgwip = rgwip+','+hosts['ip_addr']
+		c = c +1
 	   #edit all.yml menggunakan pyyaml	
 	   stream = open('../ceph-ansible/group_vars/all.yml','r')
 	   allyml = yaml.load(stream)
 	   allyml['ceph_stable_release'] = form.release.data
-	   allyml['monitor_address'] = form.ipmon.data
-           allyml['public_network'] =  form.pubnet.data
+	   allyml['monitor_address'] = monip
+           allyml['public_network'] =  hosts['pubnet']
 	   allyml['cluster_network'] = form.clnet.data
 	   allyml['osd_objectstore'] = form.osdtype.data
-	   allyml['radosgw_address'] = form.rgw_addr.data
+	   allyml['radosgw_address'] = rgwip
 	   with open('../ceph-ansible/group_vars/all.yml', 'w') as outfile:
     		yaml.dump(allyml, outfile, default_flow_style=False)
 	   #edit osds.yml menggunakan pyyaml
@@ -131,8 +166,8 @@ def deploy():
 	   with open('../ceph-ansible/group_vars/osds.yml', 'w') as outfile:
 	 	yaml.dump(allyml, outfile, default_flow_style=False)
 	   #edit hosts2 dengan seluruh IP yang diberikan
-	   osd_ip = form.iposd.data.split(',')
-	   mon_ip = form.ipmon.data.split(',')
+	   osd_ip = osdip(',')
+	   mon_ip = monip(',')
 	   file = open('/home/tasds/roseph/ceph-ansible/hosts2','w')
            file.write('[mons]\n')
 	   for ip in mon_ip:
@@ -151,15 +186,71 @@ def deploy():
                 file.write(ip+'\n')
            file.write('\n ')
 	   file.write('[rgws]\n')
-	   file.write(form.rgw_addr.data)
+	   file.write(rgwip)
 	   file.close()
 	   #jalankan bash skrip ansible
  	   bashCommand = 'ansible-playbook ../ceph-ansible/site.yml'
 	   output = subprocess.check_output(['bash','-c', bashCommand])
 	   return redirect('/')
     elif request.method == 'GET':
-	   return render_template('deploy.html', form=form)
+	if stream == '':
+		return render_template('deploypolos.html', form=form,hosts=hosts)
+	else:   
+		return render_template('deploy.html', form=form, hosts=hosts)
 	
+@app.route('/Deploy/Addnode', methods = ['GET','POST'])
+def addNode():
+    form = addnode(request.form)
+    if request.method == 'POST':
+        if form.validate() == False:
+            return render_template('adddeploy.html', form=form)
+        else:
+            host = dict()
+	    hosts = []
+	    stream = open('deploy.yml','r+')
+	    if stream != '':	
+	    	hosts = yaml.load(stream)
+	    host['hostname'] = form.hostname.data
+	    host['ip_addr'] = form.ip_addr.data
+	    subnet = ipcalc.Network(form.ip_addr.data)
+	    host['netaddr'] = subnet.network()
+	    host['ismon'] = form.ismon.data
+	    host['isosd'] = form.isosd.data
+	    host['isrgw'] = form.isrgw.data
+	    if stream != '':
+	        hosts.append(host)
+	    else:
+		hosts=[host]
+	    with open('deploy.yml', 'w+') as outfile:
+		yaml.dump(hosts, outfile, default_flow_style=False)
+            return redirect('/Deploy')
+    if request.method == 'GET' :
+	return render_template('adddeploy.html', form=form)
+
+@app.route('/Deploy/Reset')
+def deployreset():
+    bashCommand = 'rm deploy.yml'
+    output = subprocess.check_output(['bash','-c', bashCommand])
+    bashCommand = 'touch deploy.yml'
+    output = subprocess.check_output(['bash','-c', bashCommand])
+    return redirect('/Deploy')
+
+@app.route('/Deploy/Delete/<string:hostname>')
+def deploydelete(hostname):
+    stream = open('deploy.yml','r+')    
+    hosts = yaml.load(stream)
+    cari = []
+    c = 0
+    while c!=len(hosts):
+	cari.append(hosts[c]['hostname'])
+	c = c+1
+    ind = cari.index(hostname)
+    hosts.pop(ind)
+    with open('deploy.yml', 'w+') as outfile:
+        yaml.dump(hosts, outfile, default_flow_style=False)
+    return redirect('/Deploy')
+
+
 #Modul Purging
 #Tujuan : Melakukan penghapusan terhadap sistem penyimpanan yang sudah ada
 #Masukan : checkbox x2 dan 1 string konfirmasi
