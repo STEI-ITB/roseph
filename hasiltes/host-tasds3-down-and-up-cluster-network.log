@@ -1,0 +1,24 @@
+ 
+2018-06-06 22:08:45.458016 mon.tasds1 mon.0 10.10.6.1:6789/0 394 : cluster [WRN] Health check failed: 1 osds down (OSD_DOWN)
+2018-06-06 22:08:52.749539 mon.tasds1 mon.0 10.10.6.1:6789/0 429 : cluster [WRN] Health check update: 3 osds down (OSD_DOWN)
+2018-06-06 22:08:52.765527 mon.tasds1 mon.0 10.10.6.1:6789/0 432 : cluster [INF] osd.7 10.10.6.1:6801/9695 boot
+2018-06-06 22:08:53.761645 mon.tasds1 mon.0 10.10.6.1:6789/0 439 : cluster [INF] Health check cleared: OSD_DOWN (was: 2 osds down)
+2018-06-06 22:08:53.776477 mon.tasds1 mon.0 10.10.6.1:6789/0 440 : cluster [INF] osd.6 10.10.6.3:6801/7801 boot
+2018-06-06 22:08:53.776660 mon.tasds1 mon.0 10.10.6.1:6789/0 441 : cluster [INF] osd.8 10.10.6.2:6802/6822 boot
+2018-06-06 22:08:55.780567 mon.tasds1 mon.0 10.10.6.1:6789/0 448 : cluster [WRN] Health check failed: Reduced data availability: 28 pgs inactive, 45 pgs peering (PG_AVAILABILITY)
+2018-06-06 22:08:55.780705 mon.tasds1 mon.0 10.10.6.1:6789/0 449 : cluster [WRN] Health check failed: Degraded data redundancy: 28/2250 objects degraded (1.244%), 2 pgs degraded (PG_DEGRADED)
+2018-06-06 22:09:01.627881 mon.tasds1 mon.0 10.10.6.1:6789/0 452 : cluster [WRN] Health check update: Degraded data redundancy: 3270/2250 objects degraded (145.333%), 56 pgs degraded (PG_DEGRADED)
+2018-06-06 22:09:01.627980 mon.tasds1 mon.0 10.10.6.1:6789/0 453 : cluster [INF] Health check cleared: PG_AVAILABILITY (was: Reduced data availability: 28 pgs inactive, 45 pgs peering)
+2018-06-06 22:09:07.754815 mon.tasds1 mon.0 10.10.6.1:6789/0 454 : cluster [WRN] Health check update: Degraded data redundancy: 3047/2250 objects degraded (135.422%), 52 pgs degraded (PG_DEGRADED)
+2018-06-06 22:09:12.755133 mon.tasds1 mon.0 10.10.6.1:6789/0 455 : cluster [WRN] Health check update: Degraded data redundancy: 2724/2250 objects degraded (121.067%), 46 pgs degraded (PG_DEGRADED)
+2018-06-06 22:09:17.755544 mon.tasds1 mon.0 10.10.6.1:6789/0 456 : cluster [WRN] Health check update: Degraded data redundancy: 2431/2250 objects degraded (108.044%), 38 pgs degraded (PG_DEGRADED)
+2018-06-06 22:09:22.755917 mon.tasds1 mon.0 10.10.6.1:6789/0 457 : cluster [WRN] Health check update: Degraded data redundancy: 2134/2250 objects degraded (94.844%), 35 pgs degraded (PG_DEGRADED)
+2018-06-06 22:09:27.756308 mon.tasds1 mon.0 10.10.6.1:6789/0 458 : cluster [WRN] Health check update: Degraded data redundancy: 1941/2250 objects degraded (86.267%), 30 pgs degraded (PG_DEGRADED)
+2018-06-06 22:09:32.756809 mon.tasds1 mon.0 10.10.6.1:6789/0 459 : cluster [WRN] Health check update: Degraded data redundancy: 1631/2250 objects degraded (72.489%), 26 pgs degraded (PG_DEGRADED)
+2018-06-06 22:09:37.757203 mon.tasds1 mon.0 10.10.6.1:6789/0 460 : cluster [WRN] Health check update: Degraded data redundancy: 1376/2250 objects degraded (61.156%), 21 pgs degraded (PG_DEGRADED)
+2018-06-06 22:09:42.757654 mon.tasds1 mon.0 10.10.6.1:6789/0 461 : cluster [WRN] Health check update: Degraded data redundancy: 1121/2250 objects degraded (49.822%), 16 pgs degraded (PG_DEGRADED)
+2018-06-06 22:09:47.758050 mon.tasds1 mon.0 10.10.6.1:6789/0 462 : cluster [WRN] Health check update: Degraded data redundancy: 712/2250 objects degraded (31.644%), 9 pgs degraded (PG_DEGRADED)
+2018-06-06 22:09:52.758448 mon.tasds1 mon.0 10.10.6.1:6789/0 464 : cluster [WRN] Health check update: Degraded data redundancy: 491/2250 objects degraded (21.822%), 5 pgs degraded (PG_DEGRADED)
+2018-06-06 22:09:57.758908 mon.tasds1 mon.0 10.10.6.1:6789/0 465 : cluster [WRN] Health check update: Degraded data redundancy: 215/2250 objects degraded (9.556%), 3 pgs degraded (PG_DEGRADED)
+2018-06-06 22:10:02.759349 mon.tasds1 mon.0 10.10.6.1:6789/0 466 : cluster [WRN] Health check update: Degraded data redundancy: 112/2250 objects degraded (4.978%), 1 pg degraded (PG_DEGRADED)
+2018-06-06 22:10:03.819685 mon.tasds1 mon.0 10.10.6.1:6789/0 467 : cluster [INF] Health check cleared: PG_DEGRADED (was: Degraded data redundancy: 112/2250 objects degraded (4.978%), 1 pg degraded)
