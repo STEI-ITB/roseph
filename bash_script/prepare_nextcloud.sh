@@ -3,6 +3,11 @@
 read -p "Nama Pool: " pool
 read -p "Nama Image: " image
 
+#install ceph
+echo deb https://download.ceph.com/debian-luminous/ $(lsb_release -sc) main | tee /etc/apt/sources.list.d/ceph.list
+apt-get update
+apt-get install ceph
+
 echo "Moving conf file to /etc/ceph/"
 mv ceph.c* /etc/ceph/
 
