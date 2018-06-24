@@ -1,0 +1,84 @@
+WRITE
+hints = 1
+Maintaining 16 concurrent writes of 4194304 bytes to objects of size 4194304 for up to 10 seconds or 0 objects
+Object prefix: benchmark_data_tasds1_3398
+  sec Cur ops   started  finished  avg MB/s  cur MB/s last lat(s)  avg lat(s)
+    0       0         0         0         0         0           -           0
+    1      16        38        22   87.9956        88     0.41159    0.483294
+    2      16        77        61    121.99       156    0.234358     0.46203
+    3      16       106        90    119.99       116    0.594417    0.469302
+    4      16       142       126   125.989       144    0.197489    0.473067
+    5      16       177       161   128.788       140    0.199622    0.466878
+    6      16       199       183   121.989        88    0.486565    0.488567
+    7      16       232       216   123.417       132    0.492738    0.492064
+    8      16       264       248   123.988       128     0.40709    0.497143
+    9      16       296       280   124.433       128    0.485893    0.500056
+   10      16       334       318   127.188       152    0.641069    0.492199
+Total time run:         10.520109
+Total writes made:      335
+Write size:             4194304
+Object size:            4194304
+Bandwidth (MB/sec):     127.375
+Stddev Bandwidth:       23.8365
+Max bandwidth (MB/sec): 156
+Min bandwidth (MB/sec): 88
+Average IOPS:           31
+Stddev IOPS:            6
+Max IOPS:               39
+Min IOPS:               22
+Average Latency(s):     0.502057
+Stddev Latency(s):      0.2313
+Max latency(s):         1.4325
+Min latency(s):         0.135985
+ 
+Seq READ
+hints = 1
+  sec Cur ops   started  finished  avg MB/s  cur MB/s last lat(s)  avg lat(s)
+    0       0         0         0         0         0           -           0
+    1      16        59        43   171.975       172    0.674204    0.261252
+    2      16        98        82   163.977       156    0.740619    0.332163
+    3      16       141       125   166.645       172   0.0293129    0.329325
+    4      16       181       165    164.98       160     1.38242    0.345363
+    5      16       219       203   162.381       152   0.0558074    0.352579
+    6      16       257       241   160.648       152    0.238368    0.358208
+    7      16       298       282   161.124       164   0.0490022    0.358606
+    8      14       335       321   160.482       156    0.213043    0.361368
+Total time run:       8.204892
+Total reads made:     335
+Read size:            4194304
+Object size:          4194304
+Bandwidth (MB/sec):   163.317
+Average IOPS:         40
+Stddev IOPS:          2
+Max IOPS:             43
+Min IOPS:             38
+Average Latency(s):   0.387024
+Max latency(s):       1.92225
+Min latency(s):       0.0138617
+ 
+Rand READ
+hints = 1
+  sec Cur ops   started  finished  avg MB/s  cur MB/s last lat(s)  avg lat(s)
+    0       0         0         0         0         0           -           0
+    1      16        62        46   183.973       184    0.549825    0.234435
+    2      16       100        84   167.977       152    0.144375    0.305954
+    3      16       137       121   161.313       148    0.329236    0.346097
+    4      16       184       168    167.98       188  0.00248846    0.338749
+    5      16       228       212    169.58       176    0.639912     0.35072
+    6      16       274       258   171.981       184  0.00223544    0.351074
+    7      16       312       296   169.124       152     0.71476    0.353727
+    8      16       349       333   166.481       148    0.722671    0.367508
+    9      15       388       373    165.76       160    0.415331    0.369363
+   10      16       438       422   168.782       196  0.00266807    0.361396
+Total time run:       10.528019
+Total reads made:     439
+Read size:            4194304
+Object size:          4194304
+Bandwidth (MB/sec):   166.793
+Average IOPS:         41
+Stddev IOPS:          4
+Max IOPS:             49
+Min IOPS:             37
+Average Latency(s):   0.3816
+Max latency(s):       1.52761
+Min latency(s):       0.00209217

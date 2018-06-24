@@ -23,7 +23,7 @@ counter=1
 while [ $counter -le 3 ]; do
         touch $filename-iterasi$counter
         echo "$counter"
-        hasil="$(sudo rados bench -p scbench 10 write --no-cleanup)"
+        hasil="$(sudo rados bench -p scbench 10 write  --no-cleanup)"
         hasil2="$(sudo rados bench -p scbench 10 seq)"
         hasil3="$(sudo rados bench -p scbench 10 rand)"
 	echo "WRITE" >> $filename-iterasi$counter
