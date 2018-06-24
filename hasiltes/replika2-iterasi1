@@ -1,0 +1,86 @@
+WRITE
+hints = 1
+Maintaining 16 concurrent writes of 4194304 bytes to objects of size 4194304 for up to 10 seconds or 0 objects
+Object prefix: benchmark_data_tasds1_5960
+  sec Cur ops   started  finished  avg MB/s  cur MB/s last lat(s)  avg lat(s)
+    0       0         0         0         0         0           -           0
+    1      16        50        34   135.993       136    0.445846    0.376042
+    2      16        94        78   155.987       176    0.151088    0.355605
+    3      16       141       125   166.652       188    0.207052    0.347588
+    4      16       193       177   176.983       208   0.0882145    0.341481
+    5      16       236       220   175.983       172    0.230201    0.348016
+    6      16       288       272   181.315       208    0.361897    0.339977
+    7      16       334       318   181.696       184    0.307057    0.341288
+    8      16       386       370   184.982       208    0.343099    0.334814
+    9      16       428       412   183.093       168    0.944611    0.339444
+   10      16       474       458   183.182       184     0.27844    0.341223
+Total time run:         10.422599
+Total writes made:      475
+Write size:             4194304
+Object size:            4194304
+Bandwidth (MB/sec):     182.296
+Stddev Bandwidth:       22.3746
+Max bandwidth (MB/sec): 208
+Min bandwidth (MB/sec): 136
+Average IOPS:           45
+Stddev IOPS:            5
+Max IOPS:               52
+Min IOPS:               34
+Average Latency(s):     0.349242
+Stddev Latency(s):      0.202646
+Max latency(s):         0.996331
+Min latency(s):         0.0755681
+ 
+Seq READ
+hints = 1
+  sec Cur ops   started  finished  avg MB/s  cur MB/s last lat(s)  avg lat(s)
+    0       0         0         0         0         0           -           0
+    1      16        62        46   183.967       184    0.792377    0.247191
+    2      16       104        88   175.973       168    0.709459    0.308056
+    3      16       157       141   187.974       212   0.0279831    0.309061
+    4      16       203       187   186.976       184     0.19643    0.311809
+    5      16       255       239   191.177       208     0.45571     0.30569
+    6      16       306       290   193.311       204   0.0380097    0.315708
+    7      16       360       344   196.549       216    0.193229    0.309976
+    8      16       397       381   190.479       148   0.0286532    0.320707
+    9      16       445       429   190.646       192   0.0199763    0.320664
+   10      12       475       463   185.179       136     1.30616     0.33014
+Total time run:       10.200427
+Total reads made:     475
+Read size:            4194304
+Object size:          4194304
+Bandwidth (MB/sec):   186.267
+Average IOPS:         46
+Stddev IOPS:          6
+Max IOPS:             54
+Min IOPS:             34
+Average Latency(s):   0.339449
+Max latency(s):       1.30616
+Min latency(s):       0.0196719
+ 
+Rand READ
+hints = 1
+  sec Cur ops   started  finished  avg MB/s  cur MB/s last lat(s)  avg lat(s)
+    0       0         0         0         0         0           -           0
+    1      16        73        57   227.958       228  0.00271407    0.191251
+    2      16       127       111   221.964       216    0.493396    0.198497
+    3      16       177       161   214.636       200    0.874335    0.260149
+    4      16       226       210   209.973       196  0.00291253     0.27837
+    5      16       280       264   211.173       216    0.904366    0.283129
+    6      16       333       317   211.307       212  0.00281859    0.279361
+    7      16       385       369   210.832       208    0.295891    0.277942
+    8      16       422       406   202.976       148    0.496114     0.28846
+    9      16       476       460   204.421       216    0.741038    0.292346
+   10      16       531       515   205.977       220  0.00221725    0.296251
+Total time run:       10.493163
+Total reads made:     532
+Read size:            4194304
+Object size:          4194304
+Bandwidth (MB/sec):   202.799
+Average IOPS:         50
+Stddev IOPS:          5
+Max IOPS:             57
+Min IOPS:             37
+Average Latency(s):   0.311815
+Max latency(s):       2.308
+Min latency(s):       0.00206495
