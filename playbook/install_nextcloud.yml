@@ -94,6 +94,7 @@
           - php7.0-xml
           - php7.0-mbstring
           - libapache2-mod-php7.0
+          - unzip
 
      ###################################################
      # Install and configure Nextcloud
