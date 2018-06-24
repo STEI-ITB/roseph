@@ -23,9 +23,9 @@ counter=1
 while [ $counter -le 3 ]; do
         touch $filename-iterasi$counter
         echo "$counter"
-        hasil="$(sudo rados bench -p scbench 10 write  --no-cleanup)"
-        hasil2="$(sudo rados bench -p scbench 10 seq)"
-        hasil3="$(sudo rados bench -p scbench 10 rand)"
+        hasil="$(sudo rados bench -p scbench 20 write --no-cleanup)"
+        hasil2="$(sudo rados bench -p scbench 20 seq)"
+        hasil3="$(sudo rados bench -p scbench 20 rand)"
 	echo "WRITE" >> $filename-iterasi$counter
         echo "$hasil" >> $filename-iterasi$counter
 	echo " " >> $filename-iterasi$counter
