@@ -1,0 +1,247 @@
+Getting Started with Ceph
+
+-----------------------------------------------------------------
+
+hostname        IP address
+
+host1              10.10.6.1
+host2              10.10.6.2
+host3              10.10.6.3
+
+
+
+ceph-admin 
+	|_________ host1: mon1, osd0
+	|
+	|
+	|_________ host2: osd1
+	|
+	|
+	|_________ host3: osd2
+
+-------------------------------------------------------------------
+
+Note: multiple osd di satu disk bisa dilakukan, tapi tidak direkomendasikan -> bakal nurunin performa
+
+1. Ceph-deploy Setup
+
+	- Add the release key: 
+		wget -q -O- 'https://download.ceph.com/keys/release.asc' | sudo apt-key add - 
+
+	- Add package:
+		echo deb https://download.ceph.com/debian-luminous/ $(lsb_release -sc) main | sudo tee /etc/apt/sources.list.d/ceph.list
+	
+	- Update dan Install:
+		sudo apt update
+		sudo apt install ceph-deploy
+
+2. Install NTP server ke semua host dan admin
+	sudo apt-get install -y ntp ntpdate ntp-doc
+	ntpdate 0.id.pool.ntp.org
+	hwclock --systohc
+	systemctl enable ntp
+	systemctl start ntp
+
+3. Edit hosts sesuai spesifikasi
+4. Tes koneksi tiap host
+
+5. buat user dengan passwordless sudo privillage
+	-buat user cephuser di SEMUA host
+		useradd -m -s /bin/bash cephuser
+		passwd cephuser
+	
+	-konfigurasi buat punya passwordless sudo
+		echo "cephuser ALL = (root) NOPASSWD:ALL" | sudo tee /etc/sudoers.d/cephuser
+		chmod 0440 /etc/sudoers.d/cephuser
+		sed -i s'/Defaults requiretty/#Defaults requiretty'/g /etc/sudoers
+	
+6. Konfigurasi SSH
+	- install openssh-server di semua host
+		sudo apt-get install openssh-server
+
+	-generate key (password kosongin)
+		ssh-keygen
+	
+	-copy key ke semua host
+		ssh-copy-id host1
+		ssh-copy-id host2
+		ssh-copy-id host3
+
+	-edit ssh config
+		nano ~/.ssh/config
+			Host host1
+   				Hostname host1
+   				User cephuser
+			Host host2
+   				Hostname host2
+   				User cephuser
+			Host host3
+  				Hostname host3
+   				User cephuser
+	-Open Port
+		-host1 (mon dan osd0)
+			ssh host1
+			sudo apt-get install -y ufw
+			sudo ufw allow 22/tcp
+			sudo ufw allow 6789/tcp
+			sudo ufw allow 6800:7300/tcp
+			sudo ufw enable
+
+		-host2 (osd1)
+			ssh host1
+			sudo apt-get install -y ufw
+			sudo ufw allow 22/tcp
+			sudo ufw allow 6800:7300/tcp
+			sudo ufw enable
+
+		-host3 (osd2)
+			ssh host1
+			sudo apt-get install -y ufw
+			sudo ufw allow 22/tcp
+			sudo ufw allow 6800:7300/tcp
+			sudo ufw enable
+
+7. Konfigurasi disk di hosts
+	Alternatives:
+		1. 1 HDD (OS + OSD) (Not Recommended/Testing Purposes Only)
+		2. 2 HDD (1 OS & 1 OSD)
+
+			-Pake parted
+				sudo parted -s {device} mklabel gpt mkpart primary xfs 0% 100%
+
+			-atau pake fdisk
+
+			-format partition XFS
+				sudo mkfs.xfs -f {device}
+
+
+8. Konfigurasi Cluster
+	-Create directory di ceph-admin buat maintain file konfigurasi dan key buat cluster
+		mkdir cluster
+		cd cluster
+
+	-Buat Cluster
+		//ceph-deploy new {initial-monitor-hosts}
+		ceph-deploy new host1
+
+	-edit file ceph.conf buat set Network
+		nano ceph.conf
+			public network = {ip-address}/{bits}
+
+			((single host))
+				osd crush chooseleaf type = 0
+
+	-install ceph packages
+		//ceph-deploy install {ceph-host}
+		ceph-deploy install host1 host2 host3
+
+	-deploy initial monitor 
+		ceph-deploy mon create-initial
+
+	-copy admin key dan configuration file ke semua host
+		ceph-deploy admin host1 host2 host3
+
+	-deploy manager daemon
+		ceph-deploy mgr create host1
+
+	-buat osd nya
+		ceph-deploy osd create {ceph-host}:{device}
+
+	-cek cluster health
+		ssh host1 sudo ceph -s
+		((should be active+clean))
+
+9. Konfigurasi CephFS
+	- create 2 pool (data +metadata)
+		$ ceph osd pool create cephfs_data <pg_num>
+		$ ceph osd pool create cephfs_metadata <pg_num>
+
+	-enable filesystem 
+		$ ceph fs new <fs_name> <metadata> <data>
+		cth:
+			$ ceph fs new cephfs cephfs_metadata cephfs_data
+
+	-cek status
+		$ ceph mds stat
+
+	-mount CephFS
+		sudo mkdir /mnt/mycephfs
+		sudo mount -t ceph <ip monitor>:6789:/ /mnt/mycephfs
+
+		kalo gak bisa (invalid argument 22):
+			edit file /etc/ceph/ceph.conf
+			trus bagian auth nya dari cephx ganti jadi none
+			save
+
+10. Samba
+	-install samba
+		sudo apt-get install -y samba samba-common python-glade2 system-config-samba
+
+	-change mod dan ownership dari folder CephFS tadi
+		$ sudo chmod -R 0775 /mnt/mycephfs
+		$ sudo chown -R nobody:nogroup /mnt/mycephfs
+
+	-edit file /etc/samba/smb.conf
+		$ sudo nano /etc/samba/smb.conf
+
+		paling bawah kasih berikut
+			[Samba file sharing]
+			path = /mnt/mycephfs
+			browsable =yes
+			writable = yes
+			guest ok = yes
+			read only = no
+			force user = nobody
+
+	-restart samba
+		$ sudo service smbd restart
+
+		
+11. Konfigurasi Block Device
+	
+	 Admin host ________ ceph-client
+	ceph-deploy 		 	 ceph
+
+	-install ceph di client
+		ceph-deploy install ceph-client
+
+	-copy andmin key dan configuration file
+		ceph-deploy admin ceph-client 
+
+
+	-konfigurasi ceph.conf tentang pool
+		Skenario:
+			1 file primer + 2 replica
+				osd pool default size = 2
+
+				#set pg number ((approx 100 per OSD))
+				#(Total OSDs * 100) / osd pool default size
+
+				osd pool default pg num = 150
+				osd pool default pgp num = 150
+
+	-buat block device pool di admin host
+		#ceph osd pool create {pool-name} {pg-num} [{pgp-num}]
+		#values commonly used:
+		#Less than 5 OSDs set pg_num to 128
+		#Between 5 and 10 OSDs set pg_num to 512
+		#Between 10 and 50 OSDs set pg_num to 1024
+
+		ceph osd pool create rbd {pg-num} [{pgp-num}]
+		rbd pool init <pool-name>
+
+	-konfigurasi block device
+		-create block device image di client host
+			rbd create foo --size 4096 [-m {mon-IP}] [-k /path/to/ceph.client.admin.keyring]
+
+		-map image ke block device
+			sudo rbd map foo --name client.admin [-m {mon-IP}] [-k /path/to/ceph.client.admin.keyring]
+
+		-create filesystem di ceph-client host
+			sudo mkfs.ext4 -m0 /dev/rbd/rbd/foo
+
+		-mount filesystem to directory
+			sudo mkdir /mnt/ceph-block-device
+			sudo mount /dev/rbd/rbd/foo /mnt/ceph-block-device
+			cd /mnt/ceph-block-device
+
